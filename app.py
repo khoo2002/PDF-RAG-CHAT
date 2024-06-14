@@ -264,7 +264,6 @@ class User(UserMixin):
             userTmp.setter(result[0][1],result[0][2],result[0][3],result[0][4],result[0][0])
             return userTmp
 
-
 # Database
 conn = duckdb.connect("testing.db")
 conn.execute("""
@@ -706,5 +705,5 @@ def get_feedback_for_answer(answer_id):
     else:
         return "Bad Request", 404
 
-if __name__ == '__main__':
-    app.run(debug=True, port=8001)
+if __name__ == "__main__":
+    app.run(host='127.0.0.1',port=8000, debug=True)
