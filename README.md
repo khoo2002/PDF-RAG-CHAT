@@ -1,4 +1,4 @@
-# Flask Application with User Authentication and Question-Answer Management
+# Flask Application with PDF RAG LLM CHAT
 
 This project is a Flask-based web application that allows users to register, log in, and interact with a question-answering system. It includes various functionalities such as file uploads, question logging, and feedback management. The application uses DuckDB as the database for storing user information, questions, answers, and feedback.
 
@@ -33,7 +33,7 @@ This project is a Flask-based web application that allows users to register, log
 1. Clone the repository:
     ```sh
     git clone https://github.com/khoo2002/PDF-RAG-CHAT
-    cd flask-app
+    cd PDF-RAG-CHAT
     ```
 
 2. Create and activate a virtual environment:
