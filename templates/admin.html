@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        .title {
+            font-size: 24px;
+            margin-right: auto;
+        }
+        .auth-buttons {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            z-index: 1;
+        }
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown button {
+            margin-left: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+        .dropdown button:hover {
+            background-color: #45a049;
+        }
+        .file-box {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 300px; /* Fixed height for the file box */
+            overflow-y: auto; /* Add scroll if files exceed the height */
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .file-name {
+            margin-right: 10px;
+            color: #007bff;
+            text-decoration: underline;
+        }
+        .delete-icon {
+            color: #e74c3c;
+            cursor: pointer;
+        }
+        .file-input {
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+        #loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="title">`Safe` chat</span>
+        <div class="auth-buttons">
+            <div class="dropdown">
+                <button>Menu</button>
+                <div class="dropdown-content">
+                    <button onclick="navigate('questionlog')">Question log</button>
+                    <button onclick="navigate('user')">Safe chat</button>
+                    <button onclick="navigate('logout')">Log Out</button>
+                </div>
+            </div>
+        </div>
+        <h1>Admin Portal</h1>
+        <div class="file-box" id="fileBox">
+            <!-- Files will be displayed here -->
+        </div>
+        <input type="file" class="file-input" id="fileSelector" accept=".pdf">
+        <br> <br>
+        <button onclick="ingestFiles()">Ingest</button>
+        <div id="loading">Loading...</div>
+    </div>
+
+    <footer>
+        No worries. Your files are "safe". Haha. Developed by ZhaoWei
+    </footer>
+
+    <script>
+        function navigate(page) {
+            const urls = {
+                'admin': "{{ url_for('adminHalo') }}",
+                'user': "{{ url_for('userHalo') }}",
+                'questionlog': "{{ url_for('questionlog') }}",
+                'logout': "{{ url_for('logout') }}"
+            };
+            location.href = urls[page];
+        }
+                
+        var dbGlobals = {}; // Store all indexedDB related objects in a global object called "dbGlobals".
+        dbGlobals.db = null; // The database object will eventually be stored here.
+        dbGlobals.description = "This database is used to store files locally."; // The description of the database.
+        dbGlobals.name = "localFileStorage"; // The name of the database.
+        dbGlobals.version = 1; // Must be >= 1. Be aware that a database of a given name may only have one version at a time, on the client machine.
+        dbGlobals.storeName = "fileObjects"; // The name of the database's object store. Each object in the object store is a file object.
+        dbGlobals.message = ""; // When useful, contains one or more HTML strings to display to the user in the 'messages' DIV box.
+        dbGlobals.empty = true; // Indicates whether or not there's one or more records in the database object store. The object store is initially empty, so set this to true.
+
+        function requiredFeaturesSupported() {
+            switch (window.location.protocol) { // To work, IndexedDB pages must be served via the http or https protocol (or, for apps in the new Windows UI, the ms-wwa or ms-wwa-web protocols).
+                case "http:":
+                case "https:":
+                case "ms-wwa-web:": // For apps in the new Windows UI, IndexedDB works in local content loaded in the web context.
+                case "ms-wwa:": // For apps in the new Windows UI, IndexedDB works in the local context.
+                    break;
+                default:
+                    document.body.innerHTML = "<h3>IndexedDB pages must be served via the http:// or https:// protocol - resolve this issue and try again.</h3>";
+                    return false;
+            } // switch
+
+            if (!document.getElementById('fileSelector').files) {
+                document.body.innerHTML = "<h3>File API is not fully supported - upgrade your browser to the latest version.</h3>";
+                return false;
+            }
+
+            if (!window.indexedDB) {
+                if (window.mozIndexedDB) {
+                    window.indexedDB = window.mozIndexedDB;
+                } else if (window.webkitIndexedDB) {
+                    window.indexedDB = webkitIndexedDB;
+                    IDBCursor = webkitIDBCursor;
+                    IDBDatabaseException = webkitIDBDatabaseException;
+                    IDBRequest = webkitIDBRequest;
+                    IDBKeyRange = webkitIDBKeyRange;
+                    IDBTransaction = webkitIDBTransaction;
+                } else {
+                    document.body.innerHTML = "<h3>IndexedDB is not supported - upgrade your browser to the latest version.</h3>";
+                    return false;
+                }
+            } // if
+
+            if (!window.indexedDB.deleteDatabase) { // Not all implementations of IndexedDB support this method, thus we test for it here.
+                document.body.innerHTML = "<h3>The required version of IndexedDB is not supported.</h3>";
+                return false;
+            }
+
+            return true;
+        } // requiredFeaturesSupported
+
+        if (requiredFeaturesSupported()) {
+            // Add event listener for the file <input> element so the user can select some files to store in the database:
+            document.getElementById('fileSelector').addEventListener('change', handleFileSelection, false);
+
+            displayDB(); // Automatically open the database on page load
+        } // if
+
+        function displayMessage(message) {
+            console.log(message);
+        } // displayMessage
+
+        function ingestFiles() {
+            var loading = document.getElementById('loading');
+            loading.style.display = 'block'; // Show loading message
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4) {
+                    loading.style.display = 'none'; // Hide loading message
+                    if (this.status == 200) {
+                        alert('Ingesting done!');
+                        displayDB();
+                    } else {
+                        alert('Error ingesting files. Please try again later.');
+                    }
+                }
+            };
+
+            xhr.open('GET', 'http://127.0.0.1:8001/api/admin/file/ingest', true);
+            xhr.send();
+        }
+
+
+        // function openDB() {
+        //     console.log("openDB()");
+        //     displayMessage("<p>Your request has been queued.</p>"); // Normally, this will instantly be blown away by the next displayMessage().
+
+        //     if (!window.indexedDB.open) {
+        //         console.log("window.indexedDB.open is null in openDB()");
+        //         return;
+        //     } // if
+
+        //     try {
+        //         var openRequest = window.indexedDB.open(dbGlobals.name, dbGlobals.version); // Also passing an optional version number for this database.
+
+        //         openRequest.onerror = function(evt) {
+        //             console.log("openRequest.onerror fired in openDB() - error: " + (evt.target.error ? evt.target.error : evt.target.errorCode));
+        //         }; // Some browsers may only support the errorCode property.
+        //         openRequest.onblocked = openDB_onblocked; // Called if the database is opened via another process, or similar.
+        //         openRequest.onupgradeneeded = openDB_onupgradeneeded; // Called if the database doesn't exist or the database version values don't match.
+        //         openRequest.onsuccess = openDB_onsuccess; // Attempts to open an existing database (that has a correctly matching version value).
+        //     } catch (ex) {
+        //         console.log("window.indexedDB.open exception in openDB() - " + ex.message);
+        //     }
+        // } // openDB
+
+        // function openDB_onblocked(evt) {
+        //     console.log("openDB_onupgradeneeded()");
+
+        //     var message = "<p>The database is blocked - error code: " + (evt.target.error ? evt.target.error : evt.target.errorCode) + "</p>";
+        //     message += "</p>If this page is open in other browser windows, close these windows.</p>";
+
+        //     displayMessage(message);
+        // }
+
+        // function openDB_onupgradeneeded(evt) {
+        //     console.log("openDB_onupgradeneeded()");
+        //     displayMessage("<p>Your request has been queued.</p>"); // Normally, this will instantly be blown away by the next displayMessage().
+
+        //     var db = dbGlobals.db = evt.target.result; // A successfully opened database results in a database object, which we place in our global IndexedDB variable.
+
+        //     if (!db) {
+        //         console.log("db (i.e., evt.target.result) is null in openDB_onupgradeneeded()");
+        //         return;
+        //     } // if
+
+        //     try {
+        //         db.createObjectStore(dbGlobals.storeName, {
+        //             keyPath: "ID",
+        //             autoIncrement: true
+        //         }); // Create the object store such that each object in the store will be given an "ID" property that is auto-incremented monotonically. Thus, files of the same name can be stored in the database.
+        //     } catch (ex) {
+        //         console.log("Exception in openDB_onupgradeneeded() - " + ex.message);
+        //         return;
+        //     }
+
+        //     dbGlobals.message = "<p>The database has been created.</p>"; // A means of communicating this information to the openDB_onsuccess handler.
+        // } // openDB_onupgradeneeded
+
+        // function openDB_onsuccess(evt) {
+        //     console.log("openDB_onsuccess()");
+        //     displayMessage("<p>Your request has been queued.</p>"); // Normally, this will be instantly blown away by the next displayMessage().
+
+        //     var db = dbGlobals.db = evt.target.result; // A successfully opened database results in a database object, which we place in our global IndexedDB variable.
+
+        //     if (!db) {
+        //         console.log("db (i.e., evt.target.result) is null in openDB_onsuccess()");
+        //         return;
+        //     } // if
+
+        //     dbGlobals.message += "<p>The database has been opened.</p>";
+        //     displayMessage(dbGlobals.message);
+        //     dbGlobals.message = ""; // The message has been delivered to the user, "zero" it out just to be safe.
+
+        //     // Automatically display the contents of the database
+        //     displayDB();
+        // } // openDB_onsuccess
+
+        function downloadFile(filename) {
+            var url = `http://127.0.0.1:8001/api/admin/file/get/${encodeURIComponent(filename)}`;
+            window.open(url, '_blank'); // Open the file in a new tab
+            // var url = `http://127.0.0.1:8001/api/admin/file/download?filename=${encodeURIComponent(filename)}`;
+            // var a = document.createElement('a');
+            // a.href = url;
+            // a.download = filename;
+            // document.body.appendChild(a);
+            // a.click();
+            // document.body.removeChild(a);
+        }
+
+        function handleFileSelection(evt) {
+            // console.log("handleFileSelection()");
+
+            var files = evt.target.files; // The files selected by the user (as a FileList object).
+            if (!files) {
+                displayMessage("<p>At least one selected file is invalid - do not select any folders.</p><p>Please reselect and try again.</p>");
+                return;
+            }
+
+            // var db = dbGlobals.db;
+            // if (!db) {
+            //     console.log("db (i.e., dbGlobals.db) is null in handleFileSelection()");
+            //     return;
+            // } // if
+
+            // try {
+            //     var transaction = db.transaction(dbGlobals.storeName, 'readwrite'); // This is either successful or it throws an exception.
+            // } catch (ex) {
+            //     console.log("db.transaction exception in handleFileSelection() - " + ex.message);
+            //     return;
+            // } // catch
+
+            // transaction.onerror = function(evt) {
+            //     console.log("transaction.onerror fired in handleFileSelection() - error code: " + (evt.target.error ? evt.target.error : evt.target.errorCode));
+            // };
+            // transaction.onabort = function() {
+            //     console.log("transaction.onabort fired in handleFileSelection()");
+            // };
+            // transaction.oncomplete = function() {
+            //     console.log("transaction.oncomplete fired in handleFileSelection()");
+            //     displayDB(); // Refresh the file display after transaction completes
+            // };
+
+            try {
+                // var objectStore = transaction.objectStore(dbGlobals.storeName); // Note that multiple put()'s can occur per transaction.
+
+                for (var i = 0, file; file = files[i]; i++) {
+                    // var putRequest = objectStore.put(file); // The put() method will update an existing record, whereas the add() method won't.
+                    // putRequest.onsuccess = function() {
+                    //     dbGlobals.empty = false;
+                    // }; // There's at least one object in the database's object store. This info (i.e., dbGlobals.empty) is used in displayDB().
+                    // putRequest.onerror = function(evt) {
+                    //     console.log("putRequest.onerror fired in handleFileSelection() - error code: " + (evt.target.error ? evt.target.error : evt.target.errorCode));
+                    // };
+
+                    var data = new FormData();
+                    data.append("file", file, file.name);
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.withCredentials = true;
+
+                    xhr.onload = function() {
+                        alert("Uploading...");
+                        if (this.status == 200) {
+                            alert("Upload successfully!");
+                            displayDB();
+                        } else {
+                            alert("Try again later!");
+                        }
+                    };
+
+                    xhr.open("POST", "http://127.0.0.1:8001/api/admin/file/upload");
+
+                    xhr.send(data);
+
+                } // for
+
+            } catch (ex) {
+                console.log("Transaction and/or put() exception in handleFileSelection() - " + ex.message);
+                return;
+            } // catch
+
+            document.getElementById('fileSelector').value = ""; // Clear the file input after handling
+        } // handleFileSelection
+
+        function displayDB() {
+            console.log("displayDB()");
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(this.responseText);
+                    var filesContainer = document.getElementById('fileBox');
+                    filesContainer.innerHTML = ''; // Clear the container
+
+                    if (response.length > 0) {
+                        dbGlobals.empty = false;
+                        var fileListHTML = "";
+                        
+                        response.forEach(function(file) {
+                            fileListHTML += `
+                                <div class="file-item">
+                                    <span class="file-name" onclick="downloadFile('${file[2]}')">${file[2]}</span>
+                                    <span class="delete-icon" onclick="deleteFile('${file[2]}')">&times;</span>
+                                </div>`;
+                        });
+
+                        filesContainer.innerHTML = fileListHTML;
+                    } else {
+                        dbGlobals.empty = true;
+                        filesContainer.innerHTML = "<p>No files found on the server.</p>";
+                    }
+                } else if (this.readyState == 4) {
+                    console.error("Failed to fetch files from the server");
+                }
+            };
+            xhttp.open("GET", "http://127.0.0.1:8001/api/admin/file/get", true);
+            xhttp.send();
+        }
+
+        function deleteFile(name) {
+            // console.log("deleteFile()");
+
+            // var db = dbGlobals.db;
+
+            // if (!db) {
+            //     console.log("db (i.e., dbGlobals.db) is null in deleteFile()");
+            //     return;
+            // } // if
+
+            try {
+                // var transaction = db.transaction(dbGlobals.storeName, 'readwrite'); // This is either successful or it throws an exception.
+                // var objectStore = transaction.objectStore(dbGlobals.storeName);
+                // var deleteRequest = objectStore.delete(id);
+
+                var xhr = new XMLHttpRequest();
+
+                xhr.onload = function() {
+                    alert("Deleting...");
+                    if (this.status == 200) {
+                        alert("Delete successfully!");
+                        displayDB();
+                    } else {
+                        alert("Try again later!");
+                    }
+                };
+
+                xhr.open("POST", "http://127.0.0.1:8001/api/admin/file/delete/"+name);
+
+                xhr.send();
+
+                
+                // deleteRequest.onsuccess = function() {
+                //     console.log(`File with ID ${id} deleted.`);
+                //     displayDB(); // Refresh the file display after deletion
+                // };
+
+                // deleteRequest.onerror = function(evt) {
+                //     console.log("deleteRequest.onerror fired in deleteFile() - error code: " + (evt.target.error ? evt.target.error : evt.target.errorCode));
+                // };
+            } catch (ex) {
+                console.log("deleteFile() exception - " + ex.message);
+            } // catch
+        } // deleteFile
+    </script>
+</body>
+</html>

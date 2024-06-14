@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        .title {
+            font-size: 24px;
+            margin-right: auto;
+        }
+        .auth-buttons {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            /* box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); */
+            z-index: 1;
+        }
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown button {
+            margin-left: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+        .dropdown button:hover {
+            background-color: #45a049;
+        }
+        .chat-box {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        .chat-message {
+            display: block;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .user-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .username {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .message {
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .chat-input {
+            width: calc(100% - 40px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .btn-send {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-send:hover {
+            background-color: #45a049;
+        }
+        .loading-ui {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 9999;
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+        .good-button,.bad-button {
+        background-color: #fff;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        }
+
+        .good-button:hover,.bad-button:hover {
+        background-color: #f7f7f7;
+        }
+
+        .good-button i {
+        color: #34A853;
+        font-size: 12px;
+        }
+
+        .bad-button i {
+        color: #FFC107;
+        font-size: 12px;
+        }
+
+        .good-button span,.bad-button span {
+        font-size: 12px;
+        color: #666;
+        }
+
+        .good-button:hover span,.bad-button:hover span {
+        color: #333;
+        }
+        
+        .good-button.selected,.bad-button.selected {
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            }
+        
+        .answer-text {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+
+        .feedback-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 14px;
+        }
+        .feedback-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f7f7f7;
+  width: 50%;
+  margin: 10px auto;
+}
+
+.feedback-form input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.feedback-form button[type="submit"] {
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.feedback-form button[type="submit"]:hover {
+  background-color: #45a049;
+}
+        </style>
+</head>
+<body>
+    <div class="container">
+        <span class="title">`Safe` chat</span>
+        <div class="auth-buttons">
+            <div class="dropdown">
+                <button>Menu</button>
+                <div class="dropdown-content">
+                    <button onclick="profile()">Profile</button>
+                    <button onclick="logout()">Log Out</button>
+                </div>
+            </div>
+        </div>        <h1>User Portal</h1>
+        <div class="chat-box" id="chatBox">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <input type="text" class="chat-input" id="userInput" placeholder="Type your message here...">
+        <button class="btn-send" onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="loading-ui" id="loadingUI" style="display: none;">
+        Loading...
+    </div>
+
+    <footer>
+        No worries. Your files are "safe". Haha. Developed by ZhaoWei
+    </footer>
+
+    <script>
+function logout(){
+    location.href = "{{ url_for('logout') }}";
+}
+
+function sendMessage() {
+    var userInput = document.getElementById('userInput').value;
+    if (userInput.trim() !== '') {
+        displayUserMessage(userInput);
+        waitForResponse();
+        sendToBackend(userInput);
+    }
+}
+
+function displayUserMessage(message) {
+    var chatBox = document.getElementById('chatBox');
+    var userMessage = document.createElement('div');
+    userMessage.className = 'chat-message';
+    var userIcon = document.createElement('i');
+    userIcon.className = 'fas fa-user-circle user-icon';
+    var username = document.createElement('span');
+    username.className = 'username';
+    username.textContent = 'User'; // You can replace 'User' with the actual username
+    var messageText = document.createElement('span');
+    messageText.className = 'message';
+    messageText.textContent = message;
+    userMessage.appendChild(userIcon);
+    userMessage.appendChild(username);
+    userMessage.appendChild(messageText);
+    chatBox.appendChild(userMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    document.getElementById('userInput').value = '';
+}
+
+function waitForResponse() {
+    document.getElementById('userInput').disabled = true;
+    document.getElementById('userInput').placeholder = 'Waiting for response...';
+    document.getElementById('userInput').style.opacity = 0.5;
+    document.querySelector('.btn-send').disabled = true;
+    document.getElementById('loadingUI').style.display = 'block';
+}
+
+function waitDone() {
+    document.getElementById('userInput').disabled = false;
+    document.getElementById('userInput').placeholder = 'Type your message here...';
+    document.getElementById('userInput').style.opacity = 1;
+    document.querySelector('.btn-send').disabled = false;
+    document.getElementById('loadingUI').style.display = 'none';
+}
+
+
+function sendToBackend(message) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                var responseText = this.responseText;
+                var responseData = JSON.parse(responseText);
+                waitDone();
+                displaySystemMessage(responseData.answer_text);
+                addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+            } else {
+                waitDone();
+                displaySystemMessage("Failed to get response from the backend.");
+            }
+        }
+    };
+    xhttp.open("POST", "http://127.0.0.1:8001/api/user/chat/", true);
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    console.log(message);
+    var requestData = { prompt: message };
+    console.log(requestData);
+    xhttp.send(JSON.stringify(requestData));
+}
+
+function addAnswerId(answerId) {
+    var lastMessage = document.querySelector('.chat-message:last-child');
+    lastMessage.dataset.answerId = answerId;
+}
+
+var feedbackForm = null;
+
+function submitFeedback(button, type, reason) {
+  var answerId = button.parentNode.parentNode.dataset.answerId;
+  var xhttp = new XMLHttpRequest();
+  xhttp.withCredentials = true;
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4) {
+      if (this.status == 200) {
+        console.log('Feedback submitted successfully');
+        button.disabled = true;
+        var thankYouText = document.createElement('span');
+        thankYouText.textContent = 'Thank you!';
+        button.parentNode.appendChild(thankYouText);
+      } else {
+        console.log('Error submitting feedback');
+      }
+    }
+  };
+  xhttp.open("POST", "http://127.0.0.1:8001/api/user/feedback/", true);
+  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  var requestData = {
+    answer_id: answerId,
+    is_correct: (type === 'good'),
+    reason: reason
+  };
+  xhttp.send(JSON.stringify(requestData));
+}
+function displaySystemMessage(message) {
+  var chatBox = document.getElementById('chatBox');
+  var systemMessage = document.createElement('div');
+  systemMessage.className = 'chat-message';
+  var systemIcon = document.createElement('i');
+  systemIcon.className = 'fas fa-info-circle user-icon';
+  var username = document.createElement('span');
+  username.className = 'username';
+  username.textContent = 'Safe System';
+  var messageText = document.createElement('span');
+  messageText.className ='message';
+  messageText.textContent = message;
+
+  // Wrap answer text in a div
+  var answerDiv = document.createElement('div');
+  answerDiv.className = 'answer-text';
+  answerDiv.appendChild(systemIcon);
+  answerDiv.appendChild(username);
+  answerDiv.appendChild(messageText);
+
+  // Wrap feedback buttons in a separate div
+  var feedbackContainer = document.createElement('div');
+  feedbackContainer.className = 'feedback-container';
+  var goodButton = document.createElement('button');
+  goodButton.className = 'good-button';
+  goodButton.innerHTML = '<i class="fas fa-thumbs-up"></i><span>Helpful</span>';
+  goodButton.onclick = function() {
+    deselectButtons(this);
+    showFeedbackForm(this, 'good');
+  };
+  var badButton = document.createElement('button');
+  badButton.className = 'bad-button';
+  badButton.innerHTML = '<i class="fas fa-thumbs-down"></i><span>Not Helpful</span>';
+  badButton.onclick = function() {
+    deselectButtons(this);
+    showFeedbackForm(this, 'bad');
+  };
+  feedbackContainer.appendChild(goodButton);
+  feedbackContainer.appendChild(badButton);
+
+  // Add both divs to the system message
+  systemMessage.appendChild(answerDiv);
+  systemMessage.appendChild(feedbackContainer);
+
+  chatBox.appendChild(systemMessage);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function deselectButtons(button) {
+  var siblingButtons = button.parentNode.children;
+  for (var i = 0; i < siblingButtons.length; i++) {
+    if (siblingButtons[i]!== button) {
+      siblingButtons[i].classList.remove('selected');
+      siblingButtons[i].disabled = false;
+    }
+  }
+  button.classList.add('selected');
+  button.disabled = true;
+}
+
+function showFeedbackForm(button, type) {
+  if (feedbackForm!== null) {
+    feedbackForm.remove();
+    feedbackForm = null;
+  }
+  feedbackForm = document.createElement('div');
+  feedbackForm.className = 'feedback-form';
+  var reasonInput = document.createElement('input');
+  reasonInput.type = 'text';
+  reasonInput.placeholder = 'Reason for '+ type +' feedback';
+  reasonInput.style.padding = '2px';
+  reasonInput.style.border = '1px solid #ccc';
+  reasonInput.style.borderRadius = '5px';
+  reasonInput.style.width = '100%';
+  reasonInput.style.margin = 'auto';
+  var submitButton = document.createElement('button');
+  submitButton.type ='submit';
+  submitButton.textContent = 'Submit';
+  submitButton.style.color = '#fff';
+  submitButton.style.border = 'none';
+  submitButton.style.padding = '6px 15px';
+  submitButton.style.marginLeft = '10px';
+  submitButton.style.cursor = 'pointer';
+  submitButton.style.borderRadius = '5px';
+  submitButton.onclick = function() {
+    submitFeedback(button, type, reasonInput.value);
+    feedbackForm.remove();
+    feedbackForm = null;
+    var buttons = button.parentNode.children;
+    for (var i = 0; i < buttons.length; i++) {
+      if (buttons[i].tagName === 'BUTTON') {
+        buttons[i].disabled = true;
+      }
+    }
+  };
+  feedbackForm.appendChild(reasonInput);
+  feedbackForm.appendChild(submitButton);
+  button.parentNode.appendChild(feedbackForm);
+}
+</script>
+</body>
+</html>
+
