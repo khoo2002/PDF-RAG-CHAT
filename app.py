@@ -403,10 +403,13 @@ api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-UPLOAD_FOLDER = '/home/khoo/Downloads/llm/llama3/zhaowei_module/uploaded'
+UPLOAD_FOLDER = './uploaded'
 ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+if os.path.exists(UPLOAD_FOLDER) != True:
+    os.mkdir(UPLOAD_FOLDER)
 
 ingesting = False
 
