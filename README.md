@@ -14,7 +14,7 @@ This project is a Flask-based web application that allows users to register, log
 
 ### Prerequisites
 
-- Python 3.11.9
+- Python==3.11.9
 - chromadb==0.5.0
 - duckdb==0.10.3
 - fastembed==0.2.7
