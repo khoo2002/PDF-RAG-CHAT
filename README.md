@@ -55,7 +55,7 @@ This project is a Flask-based web application that allows users to register, log
 The application will be available at `http://127.0.0.1:8000`.
 
 ## Directory Structure
-
+  ```bash
 flask-app/
 │
 ├── app.py # Main application file
@@ -67,6 +67,7 @@ flask-app/
 │ ├── user.html
 │ └── question.html
 └── uploaded/ # Directory for uploaded files
+```
 
 ## API Endpoints
 
