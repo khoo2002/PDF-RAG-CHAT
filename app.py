@@ -264,6 +264,7 @@ class User(UserMixin):
             userTmp.setter(result[0][1],result[0][2],result[0][3],result[0][4],result[0][0])
             return userTmp
 
+
 # Database
 conn = duckdb.connect("testing.db")
 conn.execute("""
@@ -492,6 +493,10 @@ def userHalo():
 def get_my_ip():
     return jsonify({'ip': request.remote_addr}), 200
 
+@app.route("/hello_world", methods=["GET"])
+def hello_world():
+    return jsonify({'author': "Zhao Wei", 'github-link' : 'https://github.com/khoo2002/'}), 200
+
 @app.route("/questionlog", methods=["GET"])
 @login_required
 def questionlog():
@@ -705,5 +710,5 @@ def get_feedback_for_answer(answer_id):
     else:
         return "Bad Request", 404
 
-if __name__ == "__main__":
-    app.run(host='127.0.0.1',port=8001, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, port=8001)
