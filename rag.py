@@ -1,6 +1,6 @@
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import Milvus
 from langchain_community.chat_models import ChatOllama
-from langchain_community.embeddings import FastEmbedEmbeddings
+from langchain_community.embeddings import JinaEmbeddings
 from langchain.schema.output_parser import StrOutputParser
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -10,7 +10,6 @@ from langchain.vectorstores.utils import filter_complex_metadata
 import os
 import sys
 from PyPDF2 import PdfMerger
-
 
 UPLOAD_FOLDER = '/home/khoo/Downloads/llm/llama3/zhaowei_module/uploaded'
 
@@ -34,34 +33,32 @@ class TestingChat:
             """
         )
 
-            
     def ingest(self):
         self.clear()
-        pdf_files = [os.path.join(UPLOAD_FOLDER,f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
-        if len(pdf_files)<=0:
-            return 
+        pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
+        if len(pdf_files) <= 0:
+            return
         print(pdf_files)
-        
-        singlePdf = os.path.join(UPLOAD_FOLDER,"safesystemMerge.pdf")
-        if len(pdf_files)>1:
 
+        singlePdf = os.path.join(UPLOAD_FOLDER, "safesystemMerge.pdf")
+        if len(pdf_files) > 1:
             output_dir = singlePdf
             print("merging ...")
-            # # Loop through each folder and merge PDF files
+            merger = PdfMerger()
             for folder in pdf_files:
-                merger = PdfMerger()
                 merger.append(open(folder, 'rb'))
-                with open(output_dir , "wb") as fout:
-                    merger.write(fout)
+            with open(output_dir, "wb") as fout:
+                merger.write(fout)
             print("merging done")
         else:
-            singlePdf = os.path.join(UPLOAD_FOLDER,pdf_files[0])
+            singlePdf = os.path.join(UPLOAD_FOLDER, pdf_files[0])
 
         docs = PyPDFLoader(file_path=singlePdf).load()
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
 
-        vector_store = Chroma.from_documents(documents=chunks, embedding=FastEmbedEmbeddings())
+        embedding_model = JinaEmbeddings()
+        vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = vector_store.as_retriever(
             search_type="similarity_score_threshold",
             search_kwargs={
@@ -74,7 +71,6 @@ class TestingChat:
                       | self.prompt
                       | self.model
                       | StrOutputParser())
-
 
     def ask(self, query: str):
         if not self.chain:
