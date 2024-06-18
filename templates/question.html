@@ -280,7 +280,7 @@
                 }
                 }
             };
-            xhr.open("GET", "http://127.0.0.1:8001/api/admin/questions/" + page, true);
+            xhr.open("GET", localUrl("/api/admin/questions/") + page, true);
             xhr.send();
             }
 
@@ -412,6 +412,9 @@
         };  
     }
 
+    function localUrl(api){
+            return "http://"+window.location.hostname +":"+ window.location.port + api;
+        }
 
 </script>
 </body>

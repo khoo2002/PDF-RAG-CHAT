@@ -227,8 +227,7 @@
                     }
                 }
             };
-
-            xhr.open('GET', 'http://127.0.0.1:8001/api/admin/file/ingest', true);
+            xhr.open('GET', localUrl('/api/admin/file/ingest'), true);
             xhr.send();
         }
 
@@ -309,7 +308,7 @@
         // } // openDB_onsuccess
 
         function downloadFile(filename) {
-            var url = `http://127.0.0.1:8001/api/admin/file/get/${encodeURIComponent(filename)}`;
+            var url = localUrl(`/api/admin/file/get/${encodeURIComponent(filename)}`)
             window.open(url, '_blank'); // Open the file in a new tab
             // var url = `http://127.0.0.1:8001/api/admin/file/download?filename=${encodeURIComponent(filename)}`;
             // var a = document.createElement('a');
@@ -380,8 +379,8 @@
                             alert("Try again later!");
                         }
                     };
-
-                    xhr.open("POST", "http://127.0.0.1:8001/api/admin/file/upload");
+                    
+                    xhr.open("POST", localUrl('/api/admin/file/upload'));
 
                     xhr.send(data);
 
@@ -425,7 +424,7 @@
                     console.error("Failed to fetch files from the server");
                 }
             };
-            xhttp.open("GET", "http://127.0.0.1:8001/api/admin/file/get", true);
+            xhttp.open("GET", localUrl('/api/admin/file/get'), true);
             xhttp.send();
         }
 
@@ -456,7 +455,7 @@
                     }
                 };
 
-                xhr.open("POST", "http://127.0.0.1:8001/api/admin/file/delete/"+name);
+                xhr.open("POST", localUrl('/api/admin/file/delete/')+name);
 
                 xhr.send();
 
@@ -473,6 +472,10 @@
                 console.log("deleteFile() exception - " + ex.message);
             } // catch
         } // deleteFile
+
+        function localUrl(api){
+            return "http://"+window.location.hostname +":"+ window.location.port + api;
+        }
     </script>
 </body>
 </html>

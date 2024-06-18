@@ -311,7 +311,7 @@ function sendToBackend(message) {
             }
         }
     };
-    xhttp.open("POST", "http://127.0.0.1:8001/api/user/chat/", true);
+    xhttp.open("POST", localUrl("/api/user/chat/"), true);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     console.log(message);
     var requestData = { prompt: message };
@@ -343,7 +343,7 @@ function submitFeedback(button, type, reason) {
       }
     }
   };
-  xhttp.open("POST", "http://127.0.0.1:8001/api/user/feedback/", true);
+  xhttp.open("POST", localUrl("/api/user/feedback/"), true);
   xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
   var requestData = {
     answer_id: answerId,
@@ -451,6 +451,10 @@ function showFeedbackForm(button, type) {
   feedbackForm.appendChild(submitButton);
   button.parentNode.appendChild(feedbackForm);
 }
+function localUrl(api){
+            return "http://"+window.location.hostname +":"+ window.location.port + api;
+        }
+
 </script>
 </body>
 </html>
