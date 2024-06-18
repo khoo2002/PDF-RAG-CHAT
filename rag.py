@@ -56,15 +56,38 @@ class TestingChat:
         docs = PyPDFLoader(file_path=singlePdf).load()
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
+        print(f"Number of chunks: {len(chunks)}")
 
-        embedding_model = OllamaEmbeddings(model='jina-embeddings-v2-base-en')
-        vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
-        self.retriever = vector_store.as_retriever(
-            search_type="similarity_score_threshold",
-            search_kwargs={
-                "k": 5,
-                "score_threshold": 0.6,
-            },
+        embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
+        self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
+
+        def relevance_score_fn(score):
+            """
+            Converts a similarity score to a relevance score with custom logic.
+            
+            Parameters:
+            score (float): The similarity score.
+
+            Returns:
+            float: The relevance score.
+            """
+            # Example: Apply a custom threshold and scaling
+            if score > 0.8:
+                return 1.0  # Highly relevant
+            elif score > 0.5:
+                return 0.75  # Moderately relevant
+            elif score > 0.3:
+                return 0.5  # Less relevant
+            else:
+                return 0.0  # Not relevant
+
+        self.retriever = self.vector_store.as_retriever(
+            # search_type="similarity_score_threshold",
+            # search_kwargs={
+            #     "k": 5,
+            #     "score_threshold": 0.6,
+            # },
+            # relevance_score_fn=relevance_score_fn,
         )
 
         self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
