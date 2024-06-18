@@ -1,6 +1,6 @@
 from langchain_community.vectorstores import Milvus
 from langchain_community.chat_models import ChatOllama
-from langchain_community.embeddings import JinaEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain.schema.output_parser import StrOutputParser
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -11,7 +11,7 @@ import os
 import sys
 from PyPDF2 import PdfMerger
 
-UPLOAD_FOLDER = '/home/khoo/Downloads/llm/llama3/zhaowei_module/uploaded'
+UPLOAD_FOLDER = './uploaded'
 
 class TestingChat:
     vector_store = None
@@ -40,7 +40,7 @@ class TestingChat:
             return
         print(pdf_files)
 
-        singlePdf = os.path.join(UPLOAD_FOLDER, "safesystemMerge.pdf")
+        singlePdf = pdf_files[0]
         if len(pdf_files) > 1:
             output_dir = singlePdf
             print("merging ...")
@@ -51,13 +51,13 @@ class TestingChat:
                 merger.write(fout)
             print("merging done")
         else:
-            singlePdf = os.path.join(UPLOAD_FOLDER, pdf_files[0])
+            singlePdf = pdf_files[0]
 
         docs = PyPDFLoader(file_path=singlePdf).load()
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
 
-        embedding_model = JinaEmbeddings()
+        embedding_model = OllamaEmbeddings(model='jina-embeddings-v2-base-en')
         vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = vector_store.as_retriever(
             search_type="similarity_score_threshold",
