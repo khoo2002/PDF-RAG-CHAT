@@ -155,7 +155,8 @@ class Question():
         CREATE SEQUENCE IF NOT EXISTS seq_questionid START 1;
         """)
         conn.close()
-        
+
+        conn = duckdb.connect("testing.db")
         # Use parameterized query to safely insert data
         insert_query = """
             INSERT INTO questions (question_id, user_id, question, ip_address, endpoint, request_header, request_data, created_at)
@@ -225,6 +226,7 @@ class User(UserMixin):
         CREATE SEQUENCE IF NOT EXISTS seq_userid START 1;
         """)
         conn.close()
+        conn = duckdb.connect("testing.db")
          # Use parameterized query to safely insert data
         insert_query = """
             INSERT INTO users (user_id, username, password, role, timestamp)
