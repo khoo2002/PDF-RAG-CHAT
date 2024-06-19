@@ -240,7 +240,8 @@ class User(UserMixin):
         
         # Retrieve the newly inserted user
         result_query = "SELECT * FROM users WHERE username = ?"
-        result = conn.execute(result_query, (self.username)).fetchone()
+        params = (self.username,)
+        result = conn.execute(result_query, params).fetchone()
         
         # Close connection after operations
         conn.close()
