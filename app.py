@@ -39,9 +39,14 @@ class Answer():
         """)
         conn.close()
         conn = duckdb.connect("testing.db")
-        result = conn.execute("""
-        INSERT INTO answers VALUES (nextval('seq_answerid'),'{question_id}', '{answer_text}', '{created_at}');
-        """.format(question_id=answer_dict['question_id'], answer_text=answer_dict['answer_text'], created_at=answer_dict['created_at'])).fetchall()
+        # Use parameterized query to safely insert data
+        query = """
+            INSERT INTO answers (answer_id, question_id, answer_text, created_at)
+            VALUES (NEXTVAL('seq_answerid'), ?, ?, ?)
+        """
+        params = (answer_dict['question_id'], answer_dict['answer_text'], answer_dict['created_at'])
+        # Execute the query with parameters
+        result = conn.execute(query, params).fetchall()
         conn.close()
         print(result)
 
@@ -151,13 +156,33 @@ class Question():
         """)
         conn.close()
         
-        conn = duckdb.connect("testing.db")
-        conn.execute("""
-        INSERT INTO questions VALUES (nextval('seq_questionid'),'{user_id}', '{question}', '{ip_address}', '{endpoint}', '{request_header}', '{request_data}', '{created_at}') ON CONFLICT (question_id) DO NOTHING;
-        """.format(user_id = question_dict['user_id'], question = question_dict['question'], ip_address = question_dict['ip_address'], endpoint = question_dict['endpoint'], request_header = question_dict['request_header'], request_data = question_dict['request_data'], created_at = question_dict['created_at'])).fetchall()
+        # Use parameterized query to safely insert data
+        insert_query = """
+            INSERT INTO questions (question_id, user_id, question, ip_address, endpoint, request_header, request_data, created_at)
+            VALUES (NEXTVAL('seq_questionid'), ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (question_id) DO NOTHING
+        """
+        params = (
+            question_dict['user_id'], 
+            question_dict['question'], 
+            question_dict['ip_address'], 
+            question_dict['endpoint'], 
+            question_dict['request_header'], 
+            question_dict['request_data'], 
+            question_dict['created_at']
+        )
         
-        result = conn.execute("SELECT * FROM questions WHERE question_id = currval('seq_questionid')").fetchone()
+        # Execute the query with parameters
+        conn.execute(insert_query, params)
+        
+        # Retrieve the newly inserted question
+        result_query = "SELECT * FROM questions WHERE question_id = CURRVAL('seq_questionid')"
+        result = conn.execute(result_query).fetchone()
+        
+        # Close connection after operations
         conn.close()
+        
+        # Print the result (if any)
         print(result)
         print(len(result))
 
@@ -165,10 +190,8 @@ class Question():
             tmQ = Question()
             tmQ.setter(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[0])
             return tmQ
+        return None
         
-
-
-    
 
 # user
 class User(UserMixin):
@@ -202,12 +225,25 @@ class User(UserMixin):
         CREATE SEQUENCE IF NOT EXISTS seq_userid START 1;
         """)
         conn.close()
-        conn = duckdb.connect("testing.db")
-        result = conn.execute("""
-        INSERT INTO users VALUES (nextval('seq_userid'),'{username}', '{password}', '{role}', '{timestamp}') ON CONFLICT (username) DO NOTHING;
-        """.format(username=self.username, password=self.password, role=self.role, timestamp = self.timeCreated)).fetchall()
+         # Use parameterized query to safely insert data
+        insert_query = """
+            INSERT INTO users (user_id, username, password, role, timestamp)
+            VALUES (NEXTVAL('seq_userid'), ?, ?, ?, ?)
+            ON CONFLICT (username) DO NOTHING
+        """
+        params = (self.username, self.password, self.role, self.timeCreated)
+        
+        # Execute the query with parameters
+        conn.execute(insert_query, params)
+        
+        # Retrieve the newly inserted user
+        result_query = "SELECT * FROM users WHERE username = ?"
+        result = conn.execute(result_query, (self.username)).fetchone()
+        
+        # Close connection after operations
         conn.close()
         print(result)
+        
 
     def update(self):
         hi = 1
