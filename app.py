@@ -229,7 +229,7 @@ class User(UserMixin):
         conn = duckdb.connect("testing.db")
          # Use parameterized query to safely insert data
         insert_query = """
-            INSERT INTO users (user_id, username, password, role, timestamp)
+            INSERT INTO users (user_id, username, password, role, created_at)
             VALUES (NEXTVAL('seq_userid'), ?, ?, ?, ?)
             ON CONFLICT (username) DO NOTHING
         """
