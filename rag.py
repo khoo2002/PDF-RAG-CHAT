@@ -2,8 +2,9 @@ from langchain_community.vectorstores import Milvus
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain.schema.output_parser import StrOutputParser
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+# from langchain_core.documents import Document as langchainDocument
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores.utils import filter_complex_metadata
@@ -13,10 +14,62 @@ from PyPDF2 import PdfMerger
 
 UPLOAD_FOLDER = './uploaded'
 
+import os
+
+class Documents:
+    def __init__(self):
+        self.docs = []
+
+    def add(self, doc_path, ingest_status=True):
+        # Check if the document already exists with the same path and filename
+        if not self._exists(doc_path):
+            self.docs.append({doc_path: {"ingest": ingest_status}})
+        else:
+            print(f"Document '{doc_path}' already exists. Ignoring.")
+
+    def _exists(self, doc_path):
+        # Extract filename from doc_path
+        filename = os.path.basename(doc_path)
+        # Check if any document in self.docs has the same filename
+        for doc in self.docs:
+            existing_path = list(doc.keys())[0]
+            existing_filename = os.path.basename(existing_path)
+            if existing_filename == filename:
+                return True
+        return False
+
+    def clear(self):
+        self.docs = []
+
+    def __len__(self):
+        return len(self.docs)
+
+    def __getitem__(self, item):
+        return self.docs[item]
+
+    def __iter__(self):
+        return iter(self.docs)
+
+    def __str__(self):
+        return str(self.docs)
+
+    def __repr__(self):
+        return repr(self.docs)
+
+    def update_ingest_status(self, doc_path, ingest_status):
+        for doc in self.docs:
+            if doc_path in doc:
+                doc[doc_path]["ingest"] = ingest_status
+                break
+
+    def get_all_uningested_files(self):
+        return [list(doc.keys())[0] for doc in self.docs if not list(doc.values())[0]["ingest"]]
+
 class TestingChat:
     vector_store = None
     retriever = None
     chain = None
+    docs = None
 
     def __init__(self):
         self.model = ChatOllama(model="llama3")
@@ -33,68 +86,43 @@ class TestingChat:
             Answer: [/INST]
             """
         )
+        self.docs = Documents()
 
     def ingest(self):
-        self.clear()
+        
         pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
         if len(pdf_files) <= 0:
             return
-        print(pdf_files)
-
-        singlePdf = pdf_files[0]
         if len(pdf_files) > 1:
-            output_dir = singlePdf
-            print("merging ...")
-            merger = PdfMerger()
             for folder in pdf_files:
-                merger.append(open(folder, 'rb'))
-            with open(output_dir, "wb") as fout:
-                merger.write(fout)
-            print("merging done")
+                self.docs.add(folder, ingest_status=False)
+            print("adding document done")
         else:
-            singlePdf = pdf_files[0]
+            self.docs.add(pdf_files[0], ingest_status=False)
 
-        docs = PyPDFLoader(file_path=singlePdf).load()
+        docs = PyPDFDirectoryLoader(UPLOAD_FOLDER).load()
         chunks = self.text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)
         print(f"Number of chunks: {len(chunks)}")
 
         embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
-
-        def relevance_score_fn(score):
-            """
-            Converts a similarity score to a relevance score with custom logic.
-            
-            Parameters:
-            score (float): The similarity score.
-
-            Returns:
-            float: The relevance score.
-            """
-            # Example: Apply a custom threshold and scaling
-            if score > 0.8:
-                return 1.0  # Highly relevant
-            elif score > 0.5:
-                return 0.75  # Moderately relevant
-            elif score > 0.3:
-                return 0.5  # Less relevant
-            else:
-                return 0.0  # Not relevant
-
-        self.retriever = self.vector_store.as_retriever(
-            # search_type="similarity_score_threshold",
-            # search_kwargs={
-            #     "k": 5,
-            #     "score_threshold": 0.6,
-            # },
-            # relevance_score_fn=relevance_score_fn,
-        )
-
+        self.retriever = self.vector_store.as_retriever()
         self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
                       | self.prompt
                       | self.model
                       | StrOutputParser())
+        
+        print("digest done!")
+        if len(pdf_files) <= 0:
+            return
+        if len(pdf_files) > 1:
+            for folder in pdf_files:
+                self.docs.update_ingest_status(folder, ingest_status=True)
+            print("adding document done")
+        else:
+            self.docs.update_ingest_status(pdf_files[0], ingest_status=True)
+        
 
     def ask(self, query: str):
         if not self.chain:
