@@ -74,7 +74,7 @@ class TestingChat:
 
     def __init__(self):
         self.model = ChatOllama(model="qwen2:0.5b")
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         self.prompt = PromptTemplate.from_template(
             """
             [INST] You are a senior staff member at the Malaysian Communications & Multimedia Commission, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. [/INST]
