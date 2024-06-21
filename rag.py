@@ -4,7 +4,7 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain.schema.output_parser import StrOutputParser
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+# from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
 from fastembed import LateInteractionTextEmbedding
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import PromptTemplate
@@ -77,14 +77,11 @@ class TestingChat:
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.prompt = PromptTemplate.from_template(
             """
-            <s> [INST] You are a senior worker in Malaysian Communications & Multimedia Commission, 
-            assisting in question-answering tasks related to the all the context. Use the following 
-            pieces of retrieved context to answer the question. If you don't know the answer, just say 
-            that you don't know. Use three sentences maximum and keep the answer concise. The answer must be in 
-            the same language that the Question used. Please check carefully and remember to quote all the sources. [/INST]
+            [INST] You are a senior staff member at the Malaysian Communications & Multimedia Commission, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. [/INST]
             [INST] Question: {question}
             Context: {context}
             Answer: [/INST]
+
             """
         )
         self.docs = Documents()
@@ -107,7 +104,6 @@ class TestingChat:
         print(f"Number of chunks: {len(chunks)}")
         
         embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
-        # embedding_model = FastEmbedEmbeddings(model_name='snowflake/snowflake-arctic-embed-m')
         
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
