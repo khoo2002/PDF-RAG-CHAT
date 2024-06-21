@@ -10,6 +10,8 @@ import time
 from rag import TestingChat
 import json
 
+
+DATABASE_PATH = '../database/testing.db'
 # Class
 # answer
 class Answer():
@@ -26,7 +28,7 @@ class Answer():
 
     @staticmethod
     def store_answer(answer_dict):
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         conn.execute("""
         CREATE TABLE IF NOT EXISTS answers (
             answer_id INTEGER PRIMARY KEY ,
@@ -38,7 +40,7 @@ class Answer():
         CREATE SEQUENCE IF NOT EXISTS seq_answerid START 1;
         """)
         conn.close()
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         # Use parameterized query to safely insert data
         query = """
             INSERT INTO answers (answer_id, question_id, answer_text, created_at)
@@ -52,7 +54,7 @@ class Answer():
 
     @staticmethod
     def get_answer(question_id):
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("SELECT * FROM answers WHERE question_id = '{}'".format(question_id)).fetchone()
         conn.close()
         if result:
@@ -98,7 +100,7 @@ class Question():
         per_page = 20
         offset = (page - 1) * per_page
         
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         total_questions = conn.execute("SELECT COUNT(*) FROM questions").fetchone()[0]
         total_pages = (total_questions + per_page - 1) // per_page
         
@@ -139,7 +141,7 @@ class Question():
         return {'questions': questions, 'total_pages': total_pages}
 
     def newQuestion(question_dict):
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         conn.execute("""
         CREATE TABLE IF NOT EXISTS questions (
             question_id INTEGER PRIMARY KEY,
@@ -156,7 +158,7 @@ class Question():
         """)
         conn.close()
 
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         # Use parameterized query to safely insert data
         insert_query = """
             INSERT INTO questions (question_id, user_id, question, ip_address, endpoint, request_header, request_data, created_at)
@@ -213,7 +215,7 @@ class User(UserMixin):
         self.timeCreated = timeC
     
     def store(self):
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY ,
@@ -226,7 +228,7 @@ class User(UserMixin):
         CREATE SEQUENCE IF NOT EXISTS seq_userid START 1;
         """)
         conn.close()
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
          # Use parameterized query to safely insert data
         insert_query = """
             INSERT INTO users (user_id, username, password, role, created_at)
@@ -255,7 +257,7 @@ class User(UserMixin):
         return f"User('{self.username}', '{self.role}')"
     
     def queryByID(user_id):
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY ,
@@ -268,7 +270,7 @@ class User(UserMixin):
         CREATE SEQUENCE IF NOT EXISTS seq_userid START 1;
         """)
         conn.close()
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("""
         SELECT user_id,username,password,role,created_at from users where user_id={userid};
         """.format(userid = user_id)).fetchall()
@@ -280,7 +282,7 @@ class User(UserMixin):
     
     def queryByUsername(username):
         print(username)
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY ,
@@ -293,7 +295,7 @@ class User(UserMixin):
         CREATE SEQUENCE IF NOT EXISTS seq_userid START 1;
         """)
         conn.close()
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("""
         SELECT user_id,username,password,role,created_at from users where username='{username}';
         """.format(username = username)).fetchall()
@@ -305,7 +307,7 @@ class User(UserMixin):
 
 
 # Database
-conn = duckdb.connect("testing.db")
+conn = duckdb.connect(DATABASE_PATH)
 conn.execute("""
 CREATE TABLE IF NOT EXISTS pdf_files (
     id INTEGER PRIMARY KEY,
@@ -380,13 +382,13 @@ CREATE SEQUENCE IF NOT EXISTS seq_logid START 1;
 """)
 conn.close()
 
-conn = duckdb.connect("testing.db")
+conn = duckdb.connect(DATABASE_PATH)
 result = conn.execute("""
 INSERT INTO users VALUES (nextval('seq_userid'),'admin', 'adminMCMC123', 'admin', '{timestamp}') ON CONFLICT (username) DO NOTHING;
 """.format(timestamp=datetime.datetime.now().isoformat())).fetchall()
 conn.close()
 
-conn = duckdb.connect("testing.db")
+conn = duckdb.connect(DATABASE_PATH)
 result = conn.execute("""
 Select * from users;
 """).fetchall()
@@ -395,7 +397,7 @@ print("")
 print("Users:")
 print(result)
 
-conn = duckdb.connect("testing.db")
+conn = duckdb.connect(DATABASE_PATH)
 result = conn.execute("""
 Select * from questions;
 """).fetchall()
@@ -408,7 +410,7 @@ print()
 print()
 print()
 
-conn = duckdb.connect("testing.db")
+conn = duckdb.connect(DATABASE_PATH)
 result = conn.execute("""
 Select * from answers;
 """).fetchall()
@@ -422,7 +424,7 @@ print()
 print()
 
 
-conn = duckdb.connect("testing.db")
+conn = duckdb.connect(DATABASE_PATH)
 result = conn.execute("""
 Select * from feedback;
 """).fetchall()
@@ -560,7 +562,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            conn = duckdb.connect("testing.db")
+            conn = duckdb.connect(DATABASE_PATH)
             conn.execute("""
             INSERT INTO pdf_files 
             VALUES (nextval('seq_fileid'),'{file_path}', '{file_name}')
@@ -575,7 +577,7 @@ def upload_file():
 @app.route('/api/admin/file/get', methods=['POST','GET'])
 def get_file():
     if request.method == 'GET':
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("SELECT * FROM pdf_files").fetchall()
         conn.close()
         response = make_response(result, 200)
@@ -586,7 +588,7 @@ def get_file():
 @app.route('/api/admin/file/get/<file>', methods=['POST','GET'])
 def get_filename(file):
     if request.method == 'GET':
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("SELECT * FROM pdf_files").fetchall()
         conn.close()
         if(file in str(result)):
@@ -605,19 +607,19 @@ def get_filename(file):
 @app.route('/api/admin/file/delete/<file>', methods=['POST','GET'])
 def delete_file(file):
     if request.method == 'POST':
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("SELECT * FROM pdf_files").fetchall()
         conn.close()
 
         if(file in str(result)):
-            conn = duckdb.connect("testing.db")
+            conn = duckdb.connect(DATABASE_PATH)
             result = conn.execute("DELETE FROM pdf_files WHERE file_name='{filename}';".format(filename=file)).fetchall()
             conn.close()
 
         if(os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'],file))):
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'],file))
     
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("SELECT * FROM pdf_files").fetchall()
         conn.close()
 
@@ -715,7 +717,7 @@ def get_feedback():
             'created_at': timestamp
         }
 
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         conn.execute("""
         INSERT INTO feedback 
         VALUES (nextval('seq_feedbackid'),'{answer_id}', {is_correct}, '{reason}', '{timestamp}');
@@ -731,7 +733,7 @@ def get_feedback():
 @login_required
 def get_feedback_for_answer(answer_id):
     if request.method == 'GET':
-        conn = duckdb.connect("testing.db")
+        conn = duckdb.connect(DATABASE_PATH)
         result = conn.execute("SELECT * FROM feedback WHERE answer_id={}".format(answer_id)).fetchall()
         conn.close()
 
