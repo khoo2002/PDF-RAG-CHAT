@@ -107,7 +107,7 @@ class TestingChat:
         print(f"Number of chunks: {len(chunks)}")
         
         # embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
-        embedding_model = FastEmbedEmbeddings(model_name='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+        embedding_model = FastEmbedEmbeddings(model_name='snowflake/snowflake-arctic-embed-m')
         
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
