@@ -10,8 +10,10 @@ import time
 from rag import TestingChat
 import json
 
-
+PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
+if os.path.exists(PARENT_DATABASE) != True:
+    os.mkdir(PARENT_DATABASE)
 # Class
 # answer
 class Answer():
@@ -448,6 +450,9 @@ UPLOAD_FOLDER = '../uploaded'
 ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+if os.path.exists(UPLOAD_FOLDER) != True:
+    os.mkdir(UPLOAD_FOLDER)
 
 if os.path.exists(UPLOAD_FOLDER) != True:
     os.mkdir(UPLOAD_FOLDER)
