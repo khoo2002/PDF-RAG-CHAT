@@ -5,6 +5,7 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+from fastembed import LateInteractionTextEmbedding
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores.utils import filter_complex_metadata
@@ -106,7 +107,8 @@ class TestingChat:
         print(f"Number of chunks: {len(chunks)}")
         
         # embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
-        embedding_model = FastEmbedEmbeddings(model='colbert-ir/colbertv2.0')
+        embedding_model = LateInteractionTextEmbedding(model='colbert-ir/colbertv2.0')
+        
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
         self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
