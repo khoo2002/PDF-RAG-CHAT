@@ -73,7 +73,7 @@ class TestingChat:
     docs = None
 
     def __init__(self):
-        self.model = ChatOllama(model="llama3")
+        self.model = ChatOllama(model="qwen2:0.5b")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.prompt = PromptTemplate.from_template(
             """
@@ -106,8 +106,8 @@ class TestingChat:
         chunks = filter_complex_metadata(chunks)
         print(f"Number of chunks: {len(chunks)}")
         
-        # embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
-        embedding_model = FastEmbedEmbeddings(model_name='snowflake/snowflake-arctic-embed-m')
+        embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
+        # embedding_model = FastEmbedEmbeddings(model_name='snowflake/snowflake-arctic-embed-m')
         
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
