@@ -214,6 +214,12 @@
 .feedback-form button[type="submit"]:hover {
   background-color: #45a049;
 }
+#loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
         </style>
 </head>
 <body>
@@ -236,7 +242,9 @@
     </div>
 
     <div class="loading-ui" id="loadingUI" style="display: none;">
-        Loading...
+        <div id="loading">
+            <img src="https://media.tenor.com/images/75c231687084ca6aeaa1465a6cdc3955/tenor.gif" alt="Loading...">
+        </div>
     </div>
 
     <footer>
