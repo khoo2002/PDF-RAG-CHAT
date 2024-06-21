@@ -12,7 +12,7 @@ import os
 import sys
 from PyPDF2 import PdfMerger
 
-UPLOAD_FOLDER = './uploaded'
+UPLOAD_FOLDER = '../uploaded'
 
 import os
 
