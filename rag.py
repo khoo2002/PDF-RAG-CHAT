@@ -4,8 +4,8 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain.schema.output_parser import StrOutputParser
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
-from fastembed import LateInteractionTextEmbedding
+from langchain_community.embeddings.fastembed import LateInteractionTextEmbedding
+#from fastembed import LateInteractionTextEmbedding
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores.utils import filter_complex_metadata
