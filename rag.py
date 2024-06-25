@@ -77,7 +77,7 @@ class TestingChat:
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         self.prompt = PromptTemplate.from_template(
             """
-            [INST] You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. [/INST]
+            [INST] You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**. [/INST]
             [INST] Question: {question}
             Context: {context}
             Answer: [/INST]
