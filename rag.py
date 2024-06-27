@@ -73,7 +73,7 @@ class TestingChat:
     docs = None
 
     def __init__(self):
-        self.model = ChatOllama(model="gemma:2b")
+        self.model = ChatOllama(model="tinydolphin:latest")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         self.prompt = PromptTemplate.from_template(
             """
