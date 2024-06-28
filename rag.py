@@ -73,7 +73,7 @@ class TestingChat:
     docs = None
 
     def __init__(self):
-        self.model = ChatOllama(model="tinydolphin:latest")
+        self.model = None
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         self.prompt = PromptTemplate.from_template(
             """
@@ -93,8 +93,14 @@ class TestingChat:
         )
         self.docs = Documents()
 
-    def ingest(self):
-        
+   def initialize_chain(self, model_name="tinydolphin:latest", prompt=self.prompt):
+       self.model = ChatOllama(model=model_name)
+       self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                  | prompt
+                  | self.model
+                  | StrOutputParser())
+
+    def ingest(self):        
         pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
         if len(pdf_files) <= 0:
             return
