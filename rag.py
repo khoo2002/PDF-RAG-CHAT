@@ -5,72 +5,19 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 # from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
-from fastembed import LateInteractionTextEmbedding
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores.utils import filter_complex_metadata
 import os
 import sys
 from PyPDF2 import PdfMerger
+# from documents import Documents
 
 UPLOAD_FOLDER = '../uploaded'
 
-import os
-
-class Documents:
-    def __init__(self):
-        self.docs = []
-
-    def add(self, doc_path, ingest_status=True):
-        # Check if the document already exists with the same path and filename
-        if not self._exists(doc_path):
-            self.docs.append({doc_path: {"ingest": ingest_status}})
-        else:
-            print(f"Document '{doc_path}' already exists. Ignoring.")
-
-    def _exists(self, doc_path):
-        # Extract filename from doc_path
-        filename = os.path.basename(doc_path)
-        # Check if any document in self.docs has the same filename
-        for doc in self.docs:
-            existing_path = list(doc.keys())[0]
-            existing_filename = os.path.basename(existing_path)
-            if existing_filename == filename:
-                return True
-        return False
-
-    def clear(self):
-        self.docs = []
-
-    def __len__(self):
-        return len(self.docs)
-
-    def __getitem__(self, item):
-        return self.docs[item]
-
-    def __iter__(self):
-        return iter(self.docs)
-
-    def __str__(self):
-        return str(self.docs)
-
-    def __repr__(self):
-        return repr(self.docs)
-
-    def update_ingest_status(self, doc_path, ingest_status):
-        for doc in self.docs:
-            if doc_path in doc:
-                doc[doc_path]["ingest"] = ingest_status
-                break
-
-    def get_all_uningested_files(self):
-        return [list(doc.keys())[0] for doc in self.docs if not list(doc.values())[0]["ingest"]]
-
 class TestingChat:
-    vector_store = None
-    retriever = None
-    chain = None
-    docs = None
 
     def __init__(self):
         self.model = None
@@ -91,7 +38,7 @@ class TestingChat:
             <|im_end|>
             """
         )
-        self.docs = Documents()
+        # self.docs = Documents()
 
    def initialize_chain(self, model_name="tinydolphin:latest", prompt=self.prompt):
        self.model = ChatOllama(model=model_name)
@@ -103,15 +50,15 @@ class TestingChat:
                   | StrOutputParser())
 
     def ingest(self):        
-        pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
-        if len(pdf_files) <= 0:
-            return
-        if len(pdf_files) > 1:
-            for folder in pdf_files:
-                self.docs.add(folder, ingest_status=False)
-            print("adding document done")
-        else:
-            self.docs.add(pdf_files[0], ingest_status=False)
+        # pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
+        # if len(pdf_files) <= 0:
+        #     return
+        # if len(pdf_files) > 1:
+        #     for folder in pdf_files:
+        #         self.docs.add(folder, ingest_status=False)
+        #     print("adding document done")
+        # else:
+        #     self.docs.add(pdf_files[0], ingest_status=False)
 
         docs = PyPDFDirectoryLoader(UPLOAD_FOLDER).load()
         chunks = self.text_splitter.split_documents(docs)
@@ -128,15 +75,14 @@ class TestingChat:
                       | StrOutputParser())
         
         print("digest done!")
-        if len(pdf_files) <= 0:
-            return
-        if len(pdf_files) > 1:
-            for folder in pdf_files:
-                self.docs.update_ingest_status(folder, ingest_status=True)
-            print("adding document done")
-        else:
-            self.docs.update_ingest_status(pdf_files[0], ingest_status=True)
-        
+        # if len(pdf_files) <= 0:
+        #     return
+        # if len(pdf_files) > 1:
+        #     for folder in pdf_files:
+        #         self.docs.update_ingest_status(folder, ingest_status=True)
+        #     print("adding document done")
+        # else:
+        #     self.docs.update_ingest_status(pdf_files[0], ingest_status=True)
 
     def ask(self, query: str):
         if not self.chain:
