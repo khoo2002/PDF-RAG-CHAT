@@ -95,6 +95,8 @@ class TestingChat:
 
    def initialize_chain(self, model_name="tinydolphin:latest", prompt=self.prompt):
        self.model = ChatOllama(model=model_name)
+       if "hi" == type(prompt):
+           prompt = PromptTemplate.from_template(prompt)
        self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
                   | prompt
                   | self.model
