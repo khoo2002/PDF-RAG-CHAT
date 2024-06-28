@@ -661,6 +661,27 @@ def get_answer(questionId):
     else:
         return "Bad Request", 404
 
+@app.route('/api/admin/change/model/', methods=['POST'])
+def changeModel():
+    if request.method == 'POST':
+        json_dict = request.get_json()
+        test.initialize_chain(model_name=json_dict['model'])
+        response = make_response(result, 200)
+        return  response
+    else:
+        return "Bad Request", 404
+
+@app.route('/api/admin/change/prompt/', methods=['POST'])
+def changePrompt():
+    if request.method == 'POST':
+        json_dict = request.get_json()
+        test.initialize_chain(prompt=json_dict['prompt'])
+        response = make_response(result, 200)
+        return  response
+    else:
+        return "Bad Request", 404
+
+
 # user api
 
 @app.route('/api/user/chat/', methods=['POST'])
