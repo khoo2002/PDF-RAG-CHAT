@@ -65,7 +65,14 @@ class TestingChat:
         chunks = filter_complex_metadata(chunks)
         print(f"Number of chunks: {len(chunks)}")
         
-        embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
+        model_name = "BAAI/bge-m3"
+        model_kwargs = {"device": "cpu"}
+        encode_kwargs = {"normalize_embeddings": True}
+        embedding_model = HuggingFaceBgeEmbeddings(
+            model_name=model_name, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
+        )
+        
+        # embedding_model = OllamaEmbeddings(model='jina/jina-embeddings-v2-base-en')
         
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
