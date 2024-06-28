@@ -73,16 +73,12 @@ class TestingChat:
         #     model_name=model_name, model_kwargs=model_kwargs, encode_kwargs=encode_kwargs
         # )
         
-        embedding_model = OllamaEmbeddings(model='chatfire/bge-m3:q8_0')
+        embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
-        self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                      | self.prompt
-                      | self.model
-                      | StrOutputParser())
-        
         print("digest done!")
+        self.initialize_chain()
         # if len(pdf_files) <= 0:
         #     return
         # if len(pdf_files) > 1:
