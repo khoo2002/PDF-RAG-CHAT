@@ -44,9 +44,9 @@ class TestingChat:
         
         if "" != prompt:
             prompt = PromptTemplate.from_template(prompt)
-        self.prompt = prompt
+            self.prompt = prompt
         self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                  | prompt
+                  | self.prompt
                   | self.model
                   | StrOutputParser())
 
