@@ -8,4 +8,5 @@ vector_store = mil.as_retriever(
     search_kwargs={'k': 2, 'lambda_mult': 0.8}
 )
 
+mil.max_marginal_relevance_search("What should the terminal equipment be capable of in terms of data message format?")
 print(vector_store)
