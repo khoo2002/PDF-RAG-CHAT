@@ -29,7 +29,7 @@ class TestingChat:
             <|im_end|>
 
             <|im_start|>user
-            Question: {question}
+            Question: {question} . **Remember to quote the sources from metadata in Context.**
             Context: {context}
             <|im_end|>
             
@@ -38,8 +38,14 @@ class TestingChat:
             <|im_end|>
             """
         )
+        embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+        mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
+        self.vector_store = mil
+        self.retriever = self.vector_store.as_retriever()
+        self.initialize_chain()
+
         # self.docs = Documents()
-    def initialize_chain(self, model_name="tinydolphin:latest", prompt=""):
+    def initialize_chain(self, model_name="qwen2:0.5b", prompt=""):
         self.model = ChatOllama(model=model_name)
         
         if "" != prompt:
@@ -74,7 +80,6 @@ class TestingChat:
         # )
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
-        
         self.vector_store = Milvus.from_documents(documents=chunks, embedding=embedding_model)
         self.retriever = self.vector_store.as_retriever()
         print("digest done!")
@@ -93,8 +98,3 @@ class TestingChat:
             return "Please, add a PDF document first."
 
         return self.chain.invoke(query)
-
-    def clear(self):
-        self.vector_store = None
-        self.retriever = None
-        self.chain = None
