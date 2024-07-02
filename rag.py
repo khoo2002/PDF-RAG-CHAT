@@ -81,11 +81,6 @@ class TestingChat:
                   | self.gemmaModel
                   | StrOutputParser())
         
-        self.phi3Chain = ({"option1": RunnablePassthrough(), "option2": RunnablePassthrough(), "context": self.retriever, "question": RunnablePassthrough()}
-                  | self.phi3Prompt
-                  | self.phi3Model
-                  | StrOutputParser())
-        
 
     def ingest(self):        
         # pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
@@ -128,4 +123,8 @@ class TestingChat:
     def ask(self, query: str):
         qwen2Option = self.qwenChain.invoke(query)
         gemmaOption = self.gemmaChain.invoke(query)
-        return self.phi3Chain.invoke(qwen2Option,gemmaOption,query)
+        self.phi3Chain = ({"option1": qwen2Option, "option2": gemmaOption, "context": self.retriever, "question": RunnablePassthrough()}
+          | self.phi3Prompt
+          | self.phi3Model
+          | StrOutputParser())
+        return self.phi3Chain.invoke(query)
