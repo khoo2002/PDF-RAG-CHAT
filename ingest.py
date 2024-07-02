@@ -42,7 +42,7 @@ def ingest_from_path(paths):
         );
         
         CREATE SEQUENCE IF NOT EXISTS seq_fileid START 1;
-    """.format(file_path = os.path.join(path,filename), file_name = filename))
+    """
     conn.close()
 
     conn = duckdb.connect(DATABASE_PATH)
