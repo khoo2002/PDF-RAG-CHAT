@@ -122,7 +122,7 @@ class TestingChat:
     def ask(self, query: str):
         qwen2Option = self.qwen2Chain.invoke(query)
         gemmaOption = self.gemmaChain.invoke(query)
-        self.phi3Prompt = self.phi3Prompt.format(option1=qwen2Option,option2=gemmaOption)
+        self.phi3Prompt = self.phi3Prompt.format(question='{question}'option1=qwen2Option,option2=gemmaOption,context='{context}')
         self.phi3Prompt = PromptTemplate.from_template(self.phi3Prompt)
         self.phi3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
           | self.phi3Prompt
