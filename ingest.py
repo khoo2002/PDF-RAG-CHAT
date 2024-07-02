@@ -42,7 +42,7 @@ def ingest_from_path(paths):
         );
         
         CREATE SEQUENCE IF NOT EXISTS seq_fileid START 1;
-    """
+    """)
     conn.close()
 
     conn = duckdb.connect(DATABASE_PATH)
@@ -50,7 +50,7 @@ def ingest_from_path(paths):
     conn.close()
     print(result)
 
-    if path = None:
+    if path == None:
         return True
     for path in paths:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
