@@ -50,7 +50,7 @@ def ingest_from_path(paths):
     conn.close()
     print(result)
 
-    if path == None:
+    if paths == None:
         return True
     for path in paths:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
