@@ -126,8 +126,6 @@ class TestingChat:
         
     
     def ask(self, query: str):
-        if not self.chain:
-            return "Please, add a PDF document first."
         qwen2Option = self.qwenChain.invoke(query)
         gemmaOption = self.gemmaChain.invoke(query)
         return self.phi3Chain.invoke(qwen2Option,gemmasOption,query)
