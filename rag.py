@@ -51,16 +51,21 @@ class TestingChat:
             """
         )
         self.phi3Prompt = """
-            <|system|>
-            You are a senior staff at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Tell me which one option is better and stick with the Context and Question provided. If there is no one, give me your answer based on the context.. **Must add the document name when using**.<|end|>
-            <|user|>
-            Question: {question}
-            Option 1 = {option1}
-            Option 2 = {option2}
-            
-            Context: {context}<|end|>
-            <|senior staff|>
-            """
+        <|system|>
+        You are a senior staff at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**. Your task is to evaluate two options provided, summarize them, determine which option is better, or restructure the answer based on the given context and question. Ensure to mention the document name when using the options.
+
+        **Question**: {question}
+        **Option 1**: {option1}
+        **Option 2**: {option2}
+        
+        **Context**: {context}
+        <|end|>
+        
+        <|senior staff|>
+        **Answer**:
+        [Choose the better option based on the context. If needed, restructure the original answers based on the given context. If necessary, provide a new answer based on the question and context]
+        **Document Name**: [Insert Document Name]
+        """
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
