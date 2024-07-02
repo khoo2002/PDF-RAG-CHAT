@@ -70,7 +70,7 @@ def ingest_from_path(paths):
             INSERT INTO pdf_files 
             VALUES (nextval('seq_fileid'),'{file_path}', '{file_name}')
             ON CONFLICT (id) DO NOTHING;
-            """.format(file_path = os.path.join(path,filename), file_name = filename))
+            """.format(file_path = os.path.join(path,file), file_name = file))
             conn.close()
     return True
 
