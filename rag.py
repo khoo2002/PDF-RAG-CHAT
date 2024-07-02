@@ -20,9 +20,9 @@ UPLOAD_FOLDER = '../uploaded'
 class TestingChat:
 
     def __init__(self):
-        self.qwen2Model = "qwen2:0.5b"
-        self.gemmaModel = "gemma:2b"
-        self.phi3Model = "phi3:latest"
+        self.qwen2Model = ChatOllama("qwen2:0.5b")
+        self.gemmaModel = ChatOllama("gemma:2b")
+        self.phi3Model = ChatOllama("phi3:latest")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         self.qwen2Prompt = PromptTemplate.from_template(
             """
@@ -53,9 +53,9 @@ class TestingChat:
         self.phi3Prompt = PromptTemplate.from_template(
             """
             <|system|>
-            You are a senior staff at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.<|end|>
+            You are a senior staff at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Tell me which one option is better and stick with the Context and Question provided. If there is no one, give me your answer based on the context.. **Must add the document name when using**.<|end|>
             <|user|>
-            Question: Tell me which one option is better and stick with the context provided. If there is no one, give me your answer based on the context. 
+            Question: {question}
             Option 1 = {option1}
             Option 2 = {option2}
             
@@ -70,16 +70,22 @@ class TestingChat:
         self.initialize_chain()
 
         # self.docs = Documents()
-    def initialize_chain(self, model_name="qwen2:0.5b", prompt=""):
-        self.model = ChatOllama(model=model_name)
-        
-        if "" != prompt:
-            prompt = PromptTemplate.from_template(prompt)
-            self.prompt = prompt
-        self.chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                  | self.prompt
-                  | self.model
+    def initialize_chain(self):
+        self.qwenChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                  | self.qwen2Prompt
+                  | self.qwen2Model
                   | StrOutputParser())
+        
+        self.gemmaChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                  | self.gemmaPrompt
+                  | self.gemmaModel
+                  | StrOutputParser())
+        
+        self.phi3Chain = ({"option1": RunnablePassthrough(), "option2": RunnablePassthrough(), "context": self.retriever, "question": RunnablePassthrough()}
+                  | self.phi3Prompt
+                  | self.phi3Model
+                  | StrOutputParser())
+        
 
     def ingest(self):        
         # pdf_files = [os.path.join(UPLOAD_FOLDER, f) for f in os.listdir(UPLOAD_FOLDER) if f.endswith('.pdf')]
@@ -122,5 +128,6 @@ class TestingChat:
     def ask(self, query: str):
         if not self.chain:
             return "Please, add a PDF document first."
-
-        return self.chain.invoke(query)
+        qwen2Option = self.qwenChain.invoke(query)
+        gemmaOption = self.gemmaChain.invoke(query)
+        return self.phi3Chain.invoke(qwen2Option,gemmasOption,query)
