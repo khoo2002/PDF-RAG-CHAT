@@ -45,6 +45,11 @@ def ingest_from_path(paths):
     """.format(file_path = os.path.join(path,filename), file_name = filename))
     conn.close()
 
+    conn = duckdb.connect(DATABASE_PATH)
+    result = conn.execute("SELECT * FROM pdf_files").fetchall()
+    conn.close()
+    print(result)
+    
     for path in paths:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
