@@ -128,4 +128,4 @@ class TestingChat:
     def ask(self, query: str):
         qwen2Option = self.qwenChain.invoke(query)
         gemmaOption = self.gemmaChain.invoke(query)
-        return self.phi3Chain.invoke(qwen2Option,gemmasOption,query)
+        return self.phi3Chain.invoke(qwen2Option,gemmaOption,query)
