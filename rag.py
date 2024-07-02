@@ -20,9 +20,11 @@ UPLOAD_FOLDER = '../uploaded'
 class TestingChat:
 
     def __init__(self):
-        self.model = None
+        self.qwen2Model = "qwen2:0.5b"
+        self.gemmaModel = "gemma:2b"
+        self.phi3Model = "phi3:latest"
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
-        self.prompt = PromptTemplate.from_template(
+        self.qwen2Prompt = PromptTemplate.from_template(
             """
             <|im_start|>system
             You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
@@ -36,6 +38,29 @@ class TestingChat:
             <|im_start|>assistant
             Answer: 
             <|im_end|>
+            """
+        )
+        self.gemmaPrompt = PromptTemplate.from_template(
+            """
+            <start_of_turn>user
+            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+            Question: {question} . **Remember to quote the sources from metadata in Context.**
+            Context: {context}
+            <end_of_turn>
+            <start_of_turn>model
+            """
+        )
+        self.phi3Prompt = PromptTemplate.from_template(
+            """
+            <|system|>
+            You are a senior staff at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.<|end|>
+            <|user|>
+            Question: Tell me which one option is better and stick with the context provided. If there is no one, give me your answer based on the context. 
+            Option 1 = {option1}
+            Option 2 = {option2}
+            
+            Context: {context}<|end|>
+            <|senior staff|>
             """
         )
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
@@ -92,7 +117,8 @@ class TestingChat:
         #     print("adding document done")
         # else:
         #     self.docs.update_ingest_status(pdf_files[0], ingest_status=True)
-
+        
+    
     def ask(self, query: str):
         if not self.chain:
             return "Please, add a PDF document first."
