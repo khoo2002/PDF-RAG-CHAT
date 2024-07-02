@@ -50,8 +50,7 @@ class TestingChat:
             <start_of_turn>model
             """
         )
-        self.phi3Prompt = PromptTemplate.from_template(
-            """
+        self.phi3Prompt = """
             <|system|>
             You are a senior staff at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Tell me which one option is better and stick with the Context and Question provided. If there is no one, give me your answer based on the context.. **Must add the document name when using**.<|end|>
             <|user|>
@@ -62,7 +61,7 @@ class TestingChat:
             Context: {context}<|end|>
             <|senior staff|>
             """
-        )
+        
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
         self.vector_store = mil
@@ -71,7 +70,7 @@ class TestingChat:
 
         # self.docs = Documents()
     def initialize_chain(self):
-        self.qwenChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+        self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
                   | self.qwen2Prompt
                   | self.qwen2Model
                   | StrOutputParser())
@@ -123,8 +122,10 @@ class TestingChat:
     def ask(self, query: str):
         qwen2Option = self.qwenChain.invoke(query)
         gemmaOption = self.gemmaChain.invoke(query)
-        self.phi3Chain = ({"option1": qwen2Option, "option2": gemmaOption, "context": self.retriever, "question": RunnablePassthrough()}
+        self.phi3Prompt = self.phi3Prompt.format(option1=qwen2Option,option2=gemmaOption)
+        self.phi3Prompt = PromptTemplate.from_template(self.phi3Prompt)
+        self.phi3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
           | self.phi3Prompt
           | self.phi3Model
-          | StrOutputParser())
+          | StrOutputParser())        
         return self.phi3Chain.invoke(query)
