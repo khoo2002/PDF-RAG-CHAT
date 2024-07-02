@@ -49,7 +49,9 @@ def ingest_from_path(paths):
     result = conn.execute("SELECT * FROM pdf_files").fetchall()
     conn.close()
     print(result)
-    
+
+    if path = None:
+        return True
     for path in paths:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
