@@ -53,6 +53,7 @@ def ingest_from_path(paths):
     if paths == None:
         return True
     for path in paths:
+        
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name='LangChainCollection', drop_old=False)
@@ -61,7 +62,7 @@ def ingest_from_path(paths):
         chunks = text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)  # Assuming this function is defined elsewhere
         print(f"Number of chunks: {len(chunks)}")
-        mil.aadd_documents(chunks)
+        mil.add_documents(chunks)
         print("Ingest done for path:", path)
         pdf_files = list_pdf_filenames(path)
         for file in pdf_files:
