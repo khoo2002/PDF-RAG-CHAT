@@ -240,6 +240,13 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
         </style>
 </head>
 <body>
@@ -302,9 +309,11 @@ function displayUserMessage(message) {
     var username = document.createElement('span');
     username.className = 'username';
     username.textContent = 'User'; // You can replace 'User' with the actual username
-    var messageText = document.createElement('span');
+    var messageText = document.createElement('div');
+    var messageTextWrap = document.createElement('pre');
     messageText.className = 'message';
-    messageText.textContent = message;
+    messageTextWrap.textContent = message;
+    messageText.appendChild(messageTextWrap);
     userMessage.appendChild(userIcon);
     userMessage.appendChild(username);
     userMessage.appendChild(messageText);
@@ -397,9 +406,11 @@ function displaySystemMessage(message) {
   var username = document.createElement('span');
   username.className = 'username';
   username.textContent = 'Safe System';
-  var messageText = document.createElement('span');
+  var messageText = document.createElement('div');
+  var messageTextWrap = document.createElement('pre');
   messageText.className ='message';
-  messageText.textContent = message;
+  messageTextWrap.textContent = message;
+  messageText.appendChild(messageTextWrap);
 
   // Wrap answer text in a div
   var answerDiv = document.createElement('div');
