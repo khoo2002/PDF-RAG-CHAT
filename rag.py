@@ -20,7 +20,7 @@ UPLOAD_FOLDER = '../uploaded'
 class TestingChat:
 
     def __init__(self):
-        self.qwen2Model = ChatOllama(model="qwen2:0.5b")
+        self.qwen2Model = ChatOllama(model="qwen2:0.5b", top_k=10, top_p=0.5)
         self.gemmaModel = ChatOllama(model="gemma:2b")
         self.phi3Model = ChatOllama(model="phi3:latest")
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
