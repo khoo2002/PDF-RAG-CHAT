@@ -69,7 +69,7 @@ class TestingChat:
         """
         '''
         
-        self.llama3Prompt = """
+        self.llama3Prompt = PromptTemplate.from_template("""
         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
         You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
         **Context**: {context} <|eot_id|>
@@ -79,7 +79,7 @@ class TestingChat:
         **Answer**:
         
         **Document Name**: [Insert Document Name]
-        """
+        """)
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
