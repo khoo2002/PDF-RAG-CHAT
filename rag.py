@@ -23,6 +23,7 @@ class TestingChat:
         self.qwen2Model = ChatOllama(model="qwen2:0.5b", temperature=0.4)
         self.gemmaModel = ChatOllama(model="gemma:2b", temperature=0.4)
         self.phi3Model = ChatOllama(model="phi3:latest", top_k=10, top_p=0.5, temperature=0.4, num_predict=80)
+        self.llama3Model = ChatOllama(model="llama3:latest", top_k=10, top_p=0.5, temperature=0.4, num_predict=80)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         self.qwen2Prompt = PromptTemplate.from_template(
             """
