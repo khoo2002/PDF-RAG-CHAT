@@ -90,6 +90,10 @@ class TestingChat:
         # self.docs = Documents()
     def initialize_chain(self):
         print('initialize')
+        self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                            | self.llama3Prompt
+                            | self.llama3Model
+                            | StrOutputParser())
         '''
         self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
                   | self.qwen2Prompt
@@ -152,10 +156,5 @@ class TestingChat:
           | self.phi3Model
           | StrOutputParser()) 
         '''
-        self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                            | self.llama3Prompt
-                            | self.llama3Model
-                            | StrOutputParser())
-        
         # return self.phi3Chain.invoke(query)
         return self.llama3Chain.invoke(query)
