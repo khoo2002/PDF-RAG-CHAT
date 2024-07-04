@@ -85,15 +85,16 @@ class TestingChat:
 
         # self.docs = Documents()
     def initialize_chain(self):
-        self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                  | self.qwen2Prompt
-                  | self.qwen2Model
-                  | StrOutputParser())
+        print('initialize')
+        # self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+        #           | self.qwen2Prompt
+        #           | self.qwen2Model
+        #           | StrOutputParser())
         
-        self.gemmaChain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                  | self.gemmaPrompt
-                  | self.gemmaModel
-                  | StrOutputParser())
+        # self.gemmaChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+        #           | self.gemmaPrompt
+        #           | self.gemmaModel
+        #           | StrOutputParser())
         
 
     def ingest(self):        
