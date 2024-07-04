@@ -144,7 +144,8 @@ class TestingChat:
         #   | self.phi3Prompt
         #   | self.phi3Model
         #   | StrOutputParser()) 
-        self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+        self.llama3Chain = ({"context": self.retriever}
+                            |{"question": RunnablePassthrough()}
                             | self.llama3Prompt
                             | self.llama3Model
                             | StrOutputParser())
