@@ -20,50 +20,54 @@ UPLOAD_FOLDER = '../uploaded'
 class TestingChat:
 
     def __init__(self):
-        # self.qwen2Model = ChatOllama(model="qwen2:0.5b-instruct-q4_0", temperature=0.4)
-        # self.gemmaModel = ChatOllama(model="gemma:2b-instruct-q4_0", temperature=0.4)
-        # self.phi3Model = ChatOllama(model="phi3:3.8b-instruct", top_k=10, top_p=0.5, temperature=0.4, num_predict=80)
+        '''
+        self.qwen2Model = ChatOllama(model="qwen2:0.5b-instruct-q4_0", temperature=0.4)
+        self.gemmaModel = ChatOllama(model="gemma:2b-instruct-q4_0", temperature=0.4)
+        self.phi3Model = ChatOllama(model="phi3:3.8b-instruct", top_k=10, top_p=0.5, temperature=0.4, num_predict=80)
+        '''
         self.llama3Model = ChatOllama(model="llama3:latest", top_k=10, top_p=0.5, temperature=0.4, num_predict=80)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
-       #  self.qwen2Prompt = PromptTemplate.from_template(
-       #      """
-       #      <|im_start|>system
-       #      You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-       #      <|im_end|>
+        '''
+        self.qwen2Prompt = PromptTemplate.from_template(
+            """
+            <|im_start|>system
+            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+            <|im_end|>
 
-       #      <|im_start|>user
-       #      Question: {question} . **Remember to quote the sources from metadata in Context.**
-       #      Context: {context}
-       #      <|im_end|>
+            <|im_start|>user
+            Question: {question} . **Remember to quote the sources from metadata in Context.**
+            Context: {context}
+            <|im_end|>
             
-       #      <|im_start|>assistant
-       #      Answer: 
-       #      <|im_end|>
-       #      """
-       #  )
-       #  self.gemmaPrompt = PromptTemplate.from_template(
-       #      """
-       #      <start_of_turn>user
-       #      You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-       #      Question: {question} . **Remember to quote the sources from metadata in Context.**
-       #      Context: {context}
-       #      <end_of_turn>
-       #      <start_of_turn>model
-       #      """
-       #  )
-       #  self.phi3Prompt = """
-       #  <|system|>
-       # You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-       #  **Question**: {question}
+            <|im_start|>assistant
+            Answer: 
+            <|im_end|>
+            """
+        )
+        self.gemmaPrompt = PromptTemplate.from_template(
+            """
+            <start_of_turn>user
+            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+            Question: {question} . **Remember to quote the sources from metadata in Context.**
+            Context: {context}
+            <end_of_turn>
+            <start_of_turn>model
+            """
+        )
+        self.phi3Prompt = """
+        <|system|>
+       You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+        **Question**: {question}
         
-       #  **Context**: {option1}. {option2}. {context}
-       #  <|end|>
+        **Context**: {option1}. {option2}. {context}
+        <|end|>
         
-       #  <|senior staff|>
-       #  **Answer**:
-       #  [Choose the better option based on the context. If needed, restructure the original answers based on the given context. If necessary, provide a new answer based on the question and context]
-       #  **Document Name**: [Insert Document Name]
-       #  """
+        <|senior staff|>
+        **Answer**:
+        [Choose the better option based on the context. If needed, restructure the original answers based on the given context. If necessary, provide a new answer based on the question and context]
+        **Document Name**: [Insert Document Name]
+        """
+        '''
         
         self.llama3Prompt = """
         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
@@ -86,15 +90,17 @@ class TestingChat:
         # self.docs = Documents()
     def initialize_chain(self):
         print('initialize')
-        # self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-        #           | self.qwen2Prompt
-        #           | self.qwen2Model
-        #           | StrOutputParser())
+        '''
+        self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                  | self.qwen2Prompt
+                  | self.qwen2Model
+                  | StrOutputParser())
         
-        # self.gemmaChain = ({"context": self.retriever, "question": RunnablePassthrough()}
-        #           | self.gemmaPrompt
-        #           | self.gemmaModel
-        #           | StrOutputParser())
+        self.gemmaChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                  | self.gemmaPrompt
+                  | self.gemmaModel
+                  | StrOutputParser())
+        '''
         
 
     def ingest(self):        
@@ -136,16 +142,17 @@ class TestingChat:
         
     
     def ask(self, query: str):
-        # qwen2Option = self.qwen2Chain.invoke(query)
-        # gemmaOption = self.gemmaChain.invoke(query)
-        # self.phi3Prompt = self.phi3Prompt.format(question='{question}', option1=qwen2Option, option2=gemmaOption, context='{context}')
-        # self.phi3Prompt = PromptTemplate.from_template(self.phi3Prompt)
-        # self.phi3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-        #   | self.phi3Prompt
-        #   | self.phi3Model
-        #   | StrOutputParser()) 
-        self.llama3Chain = ({"context": self.retriever}
-                            |{"question": RunnablePassthrough()}
+        '''
+        qwen2Option = self.qwen2Chain.invoke(query)
+        gemmaOption = self.gemmaChain.invoke(query)
+        self.phi3Prompt = self.phi3Prompt.format(question='{question}', option1=qwen2Option, option2=gemmaOption, context='{context}')
+        self.phi3Prompt = PromptTemplate.from_template(self.phi3Prompt)
+        self.phi3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+          | self.phi3Prompt
+          | self.phi3Model
+          | StrOutputParser()) 
+        '''
+        self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
                             | self.llama3Prompt
                             | self.llama3Model
                             | StrOutputParser())
