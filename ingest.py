@@ -56,7 +56,7 @@ def ingest_from_path(paths):
         
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
-        mil = Milvus(embedding_function=embedding_model, collection_name='LangChainCollection', drop_old=False)
+        mil = Milvus(embedding_function=embedding_model, collection_name='LangChainCollection', drop_old=False, auto_id=True)
         # Assuming PyPDFDirectoryLoader is defined elsewhere and UPLOAD_FOLDER is a constant
         docs = PyPDFDirectoryLoader(path).load()  
         chunks = text_splitter.split_documents(docs)
