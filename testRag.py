@@ -30,6 +30,7 @@ def prompting():
                yield f"data: {json_data}\n\n"
         print(" ".join(data))
         return Response(generate(), mimetype='text/event-stream')
+        print(" ".join(data))
     else:
         return "Bad Request", 404
     
