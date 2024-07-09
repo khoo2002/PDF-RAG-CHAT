@@ -14,11 +14,6 @@ import os
 import sys
 from PyPDF2 import PdfMerger
 # from documents import Documents
-
-UPLOAD_FOLDER = '../uploaded'
-
-class TestingChat:
-
 adding_pack = """Section 1, Short title
 Section 2, Commencement
 Section 3, Objects
@@ -309,6 +304,11 @@ Section 280, Old licensees shall indicate intention
 Section 281, Registered licensee may apply for an individual licence under this Act
 Section 282, Determination of listed facilities and services
 """
+
+UPLOAD_FOLDER = '../uploaded'
+
+class TestingChat:
+
     def __init__(self):
         '''
         self.qwen2Model = ChatOllama(model="qwen2:0.5b-instruct-q4_0", temperature=0.4)
