@@ -21,6 +21,7 @@ test = TestingChat()
 @app.route('/streamByJson', methods=['POST'])
 def prompting():
     if request.method == 'POST':
+        json_dict = request.get_json()
         response_text = test.ask(json_dict['prompt'])
         def generate(query):
            for i in enumerate(test.askByStream(query)):
