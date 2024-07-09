@@ -1,5 +1,5 @@
-from langchain_community.vectorstores import Milvus
-from langchain_community.embeddings import OllamaEmbeddings
+# from langchain_community.vectorstores import Milvus
+# from langchain_community.embeddings import OllamaEmbeddings
 from rag import TestingChat
 
 import itertools
