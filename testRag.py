@@ -28,10 +28,10 @@ def prompting():
                json_data = json.dumps({"response": i})
                data.append(i)
                yield f"data: {json_data}\n\n"
+        
+        return Response(generate(), mimetype='text/event-stream')
         with open('result.txt','w') as file:
             file.write(" ".join(data))
-        return Response(generate(), mimetype='text/event-stream')
-        print(" ".join(data))
     else:
         return "Bad Request", 404
     
