@@ -7,7 +7,7 @@ mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCol
 vector_store = mil.as_retriever(
 )
 
-mil.max_marginal_relevance_search("What is section 233 in CMA?")
+mil.similarity_search("What is section 233 in CMA?")
 print(vector_store)
 
 
