@@ -22,13 +22,13 @@ test = TestingChat()
 def prompting():
     if request.method == 'POST':
         json_dict = request.get_json()
-        answer = ""
+        data = []
         def generate():
            for i in enumerate(test.askByStream(json_dict['prompt'])):
                json_data = json.dumps({"response": i})
-               answer = answer + i
+               data.append(i)
                yield f"data: {json_data}\n\n"
-        print(answer)
+        print(" ".join(data))
         return Response(generate(), mimetype='text/event-stream')
     else:
         return "Bad Request", 404
