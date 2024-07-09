@@ -15,4 +15,6 @@ print(vector_store)
 
 test = TestingChat()
 
-response_text = test.askByStream("What is CMA?")
+for tet in test.askByStream("What is CMA?"):
+    print(tet)
+    print(type(tet))
