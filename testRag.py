@@ -18,15 +18,18 @@ app = Flask(__name__)
 #print(mil.similarity_search("What is section 233 in CMA?", k=10))
 
 test = TestingChat()
-        
-@app.route('/streamByJson')
-def stream_json():
-    # Stream JSON data
-    def generate(query):
-        for i in enumerate(test.askByStream(query)):
-            json_data = json.dumps({"response": i})
-            yield f"data: {json_data}\n\n"
-    return Response(generate(), mimetype='text/event-stream')
+@app.route('/streamByJson', methods=['POST'])
+def prompting():
+    if request.method == 'POST':
+        response_text = test.ask(json_dict['prompt'])
+        def generate(query):
+           for i in enumerate(test.askByStream(query)):
+               json_data = json.dumps({"response": i})
+               yield f"data: {json_data}\n\n"
+        return Response(generate(), mimetype='text/event-stream')
+    else:
+        return "Bad Request", 404
+    
 
 if __name__ == "__main__":
     app.run(host='localhost', port=23423)
