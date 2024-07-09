@@ -24,14 +24,16 @@ def prompting():
         json_dict = request.get_json()
         data = []
         def generate():
-           for i in enumerate(test.askByStream(json_dict['prompt'])):
-               json_data = json.dumps({"response": i})
-               data.append(i)
-               yield f"data: {json_data}\n\n"
-        
+            it = enumerate(test.askByStream(json_dict['prompt']))
+            while True:
+                try:
+                    json_data = json.dumps({"response": i})
+                    data.append(i)
+                    yield f"data: {json_data}\n\n"
+                except StopIteration:
+                    print(data)
+                    break        
         return Response(generate(), mimetype='text/event-stream')
-        with open('result.txt','w') as file:
-            file.write(" ".join(data))
     else:
         return "Bad Request", 404
     
