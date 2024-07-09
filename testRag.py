@@ -27,6 +27,7 @@ def prompting():
             it = enumerate(test.askByStream(json_dict['prompt']))
             while True:
                 try:
+                    i = next(it)
                     json_data = json.dumps({"response": i})
                     data.append(i)
                     yield f"data: {json_data}\n\n"
