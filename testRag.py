@@ -1,5 +1,6 @@
 from langchain_community.vectorstores import Milvus
 from langchain_community.embeddings import OllamaEmbeddings
+from rag import TestingChat
 
 embedding_model = OllamaEmbeddings(model='nomic-embed-text')
 mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
@@ -10,3 +11,8 @@ vector_store = mil.as_retriever(
 
 mil.max_marginal_relevance_search("What should the terminal equipment be capable of in terms of data message format?")
 print(vector_store)
+
+
+test = TestingChat()
+
+response_text = test.askByStream("What is CMA?")
