@@ -23,13 +23,13 @@ def prompting():
     if request.method == 'POST':
         json_dict = request.get_json()
         answer = ""
-        def generate(query):
-           for i in enumerate(test.askByStream(query)):
+        def generate():
+           for i in enumerate(test.askByStream(json_dict['prompt'])):
                json_data = json.dumps({"response": i})
                answer = answer + i
                yield f"data: {json_data}\n\n"
         print(answer)
-        return Response(generate(json_dict['prompt']), mimetype='text/event-stream')
+        return Response(generate(), mimetype='text/event-stream')
     else:
         return "Bad Request", 404
     
