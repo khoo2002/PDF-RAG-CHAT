@@ -369,7 +369,7 @@ Section 282, Determination of listed facilities and services
         **Answer**:
         
         **Document Name**: [Insert Document Name]
-        """.format(context="{context}",adding_pack=adding_pack,question="{question}")})
+        """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
