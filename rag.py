@@ -536,7 +536,6 @@ class TestingChat:
             <|im_start|>assistant
             Answer: 
             **Document Name**: 
-            <|im_end|>
             """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
         else:
             self.qwen2Prompt = PromptTemplate.from_template("""
@@ -550,7 +549,6 @@ class TestingChat:
             <|im_start|>assistant
             Answer: 
             **Document Name**: 
-            <|im_end|>
         """)    
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
