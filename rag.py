@@ -534,8 +534,7 @@ class TestingChat:
             **Context**: {context} {adding_pack}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.
             <|im_end|>
             <|im_start|>assistant
-            Answer: 
-            **Document Name**: 
+            Answer:
             """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
         else:
             self.qwen2Prompt = PromptTemplate.from_template("""
@@ -548,7 +547,6 @@ class TestingChat:
             <|im_end|>
             <|im_start|>assistant
             Answer: 
-            **Document Name**: 
         """)    
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
