@@ -436,44 +436,87 @@ class TestingChat:
         #     self.docs.update_ingest_status(pdf_files[0], ingest_status=True)
         
     
-    def ask(self, query: str):
-        self.llama3Model = ChatOllama(model="llama3:latest", top_k=10, top_p=0.5, temperature=0.4)
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
-        self.llama3Prompt = None
-        if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
-            self.llama3Prompt = PromptTemplate.from_template("""
-            <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-            **Context**: {context} {adding_pack}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.<|eot_id|>
-            <|start_header_id|>user<|end_header_id|>
-            **Question**: {question} <|eot_id|>
-            <|start_header_id|>senior staff<|end_header_id|>
-            **Answer**:
+    # def ask(self, query: str):
+    #     self.llama3Model = ChatOllama(model="llama3:latest", top_k=10, top_p=0.5, temperature=0.4)
+    #     self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
+    #     self.llama3Prompt = None
+    #     if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
+    #         self.llama3Prompt = PromptTemplate.from_template("""
+    #         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    #         You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+    #         **Context**: {context} {adding_pack}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.<|eot_id|>
+    #         <|start_header_id|>user<|end_header_id|>
+    #         **Question**: {question} <|eot_id|>
+    #         <|start_header_id|>senior staff<|end_header_id|>
+    #         **Answer**:
             
+    #         **Document Name**: [Insert Document Name]
+    #         """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
+    #     else:
+    #         self.llama3Prompt = PromptTemplate.from_template("""
+    #     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    #     You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+    #     **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.<|eot_id|>
+    #     <|start_header_id|>user<|end_header_id|>
+    #     **Question**: {question} <|eot_id|>
+    #     <|start_header_id|>senior staff<|end_header_id|>
+    #     **Answer**:
+        
+    #     **Document Name**: [Insert Document Name]
+    #     """)    
+        
+    #     embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+    #     mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
+    #     self.vector_store = mil
+    #     self.retriever = self.vector_store.as_retriever()
+    #     self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+    #                         | self.llama3Prompt
+    #                         | self.llama3Model
+    #                         | StrOutputParser())
+    #     return self.llama3Chain.invoke(query)
+
+    def ask(self, query: str):
+        self.phi3Model = ChatOllama(model="phi3:3.8b-instruct", top_k=10, top_p=0.5, temperature=0.4)
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
+        self.phi3Prompt = None
+        if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
+            self.phi3Prompt = PromptTemplate.from_template("""
+            <|system|>
+            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+            **Context**: {context} {adding_pack}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.
+            <|end|>
+            <|user|>
+            **Question**: {question}
+            <|end|>
+            <|senior staff|>
+            **Answer**:
+            [Give your answer here]
             **Document Name**: [Insert Document Name]
             """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
         else:
-            self.llama3Prompt = PromptTemplate.from_template("""
-        <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-        You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-        **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.<|eot_id|>
-        <|start_header_id|>user<|end_header_id|>
-        **Question**: {question} <|eot_id|>
-        <|start_header_id|>senior staff<|end_header_id|>
-        **Answer**:
-        
-        **Document Name**: [Insert Document Name]
+            self.phi3Prompt = PromptTemplate.from_template("""
+        <|system|>
+            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+            **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.
+            <|end|>
+            <|user|>
+            **Question**: {question}
+            <|end|>
+            <|senior staff|>
+            **Answer**:
+            [Give your answer here]
+            **Document Name**: [Insert Document Name]
         """)    
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
         self.vector_store = mil
         self.retriever = self.vector_store.as_retriever()
-        self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                            | self.llama3Prompt
-                            | self.llama3Model
+        self.phi3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+                            | self.phi3Prompt
+                            | self.phi3Model
                             | StrOutputParser())
-        return self.llama3Chain.invoke(query)
+        return self.phi3Chain.invoke(query)
 
 
     def askByStream(self, query: str):
