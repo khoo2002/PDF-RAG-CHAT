@@ -535,7 +535,7 @@ class TestingChat:
             <|im_end|>
             <|im_start|>assistant
             Answer: 
-            **Document Name**: [Insert Document Name]
+            **Document Name**: 
             <|im_end|>
             """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
         else:
@@ -549,7 +549,7 @@ class TestingChat:
             <|im_end|>
             <|im_start|>assistant
             Answer: 
-            **Document Name**: [Insert Document Name]
+            **Document Name**: 
             <|im_end|>
         """)    
         
