@@ -523,7 +523,7 @@ class TestingChat:
     def ask(self, query: str):
         self.qwen2Model = ChatOllama(model="qwen2:0.5b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
-        self.qwen2Model = None
+        self.qwen2Prompt = None
         if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
             self.qwen2Prompt = PromptTemplate.from_template("""
             <|im_start|>system
