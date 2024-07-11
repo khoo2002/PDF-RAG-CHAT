@@ -435,7 +435,7 @@ class TestingChat:
         # else:
         #     self.docs.update_ingest_status(pdf_files[0], ingest_status=True)
         
-    LLAMA3
+    "LLAMA3"
     def ask(self, query: str):
         self.llama3Model = ChatOllama(model="llama3:latest", top_k=10, top_p=0.5, temperature=0.4)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
