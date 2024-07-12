@@ -9,8 +9,8 @@ import duckdb
 import time
 from rag import TestingChat
 import json
-import threading
-import asyncio
+from celery import Celery
+
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
@@ -453,6 +453,13 @@ ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
+#celery
+app.config.update(
+    CELERY_BROKER_URL='redis://localhost:6379/0',
+    CELERY_RESULT_BACKEND='redis://localhost:6379/0'
+)
+celery = make_celery(app)
+
 if os.path.exists(UPLOAD_FOLDER) != True:
     os.mkdir(UPLOAD_FOLDER)
 
@@ -469,7 +476,6 @@ def limit_access():
         return 'Access denied', 403
     if ingesting:
         return 'Services will return soon. Try again later!', 503
-
 
 # Login & Authentication
 @login_manager.user_loader
@@ -686,49 +692,49 @@ def get_answer(questionId):
 
 # user api
 
-@app.route('/api/user/chat/', methods=['POST'])
-def prompting():
-    if request.method == 'POST':
-        json_dict = request.get_json()
-        ip_address = request.remote_addr
-        endpoint = request.path
-        request_header = dict(request.headers)
-        request_data = json_dict
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        if 'current_user' not in locals():
-            current_user = User()
-            current_user.id = 1000
-        # Record the data
-        record = {
-            'user_id': current_user.id,
-            'question': json_dict['prompt'],
-            'ip_address': ip_address,
-            'endpoint': endpoint,
-           'request_header': json.dumps(request_header),
-           'request_data': json.dumps(request_data),
-            'created_at': timestamp
-        }
+# @app.route('/api/user/chat/', methods=['POST'])
+# def prompting():
+#     if request.method == 'POST':
+#         json_dict = request.get_json()
+#         ip_address = request.remote_addr
+#         endpoint = request.path
+#         request_header = dict(request.headers)
+#         request_data = json_dict
+#         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         if 'current_user' not in locals():
+#             current_user = User()
+#             current_user.id = 1000
+#         # Record the data
+#         record = {
+#             'user_id': current_user.id,
+#             'question': json_dict['prompt'],
+#             'ip_address': ip_address,
+#             'endpoint': endpoint,
+#            'request_header': json.dumps(request_header),
+#            'request_data': json.dumps(request_data),
+#             'created_at': timestamp
+#         }
         
-        tmpQ = Question.newQuestion(record)
-        asyncio.set_event_loop(asyncio.new_event_loop())
-        loop = asyncio.get_event_loop()
-        response_text = loop.run_until_complete(generating(test,json_dict['prompt']))
-        # response_text = test.ask(json_dict['prompt'])
-        print(response_text)
-        # Store the answer
-        answer_record = {
-            'question_id': tmpQ.question_id,  # Use the same question ID as the question
-            'answer_text': response_text,
-            'created_at': timestamp
-        }
-        answer = Answer.store_answer(answer_record)
-        answer = Answer.get_answer(tmpQ.question_id)
-        answer_id = answer['answer'][0]['answer_id']
-        print('done')
-        response = make_response(jsonify({'answer_text': response_text, 'answer_id': answer_id}), 200)
-        return response
-    else:
-        return "Bad Request", 404
+#         tmpQ = Question.newQuestion(record)
+#         asyncio.set_event_loop(asyncio.new_event_loop())
+#         loop = asyncio.get_event_loop()
+#         response_text = loop.run_until_complete(generating(test,json_dict['prompt']))
+#         # response_text = test.ask(json_dict['prompt'])
+#         print(response_text)
+#         # Store the answer
+#         answer_record = {
+#             'question_id': tmpQ.question_id,  # Use the same question ID as the question
+#             'answer_text': response_text,
+#             'created_at': timestamp
+#         }
+#         answer = Answer.store_answer(answer_record)
+#         answer = Answer.get_answer(tmpQ.question_id)
+#         answer_id = answer['answer'][0]['answer_id']
+#         print('done')
+#         response = make_response(jsonify({'answer_text': response_text, 'answer_id': answer_id}), 200)
+#         return response
+#     else:
+#         return "Bad Request", 404
     
 
 @app.route('/api/user/feedback/', methods=['POST'])
@@ -783,9 +789,73 @@ def get_feedback_for_answer(answer_id):
     else:
         return "Bad Request", 404
 
-async def generating(model,prompt):
-    return model.ask(prompt)
-    
+
+@app.route('/api/user/chat/', methods=['POST'])
+def prompting():
+    try:
+        json_dict = request.get_json()
+        if not json_dict or 'prompt' not in json_dict:
+            return make_response(jsonify({'error': 'Invalid request data'}), 400)
+        
+        ip_address = request.remote_addr
+        endpoint = request.path
+        request_header = dict(request.headers)
+        request_data = json_dict
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        current_user = User()
+        current_user.id = 1000
+        
+        record = {
+            'user_id': current_user.id,
+            'question': json_dict['prompt'],
+            'ip_address': ip_address,
+            'endpoint': endpoint,
+            'request_header': json.dumps(request_header),
+            'request_data': json.dumps(request_data),
+            'created_at': timestamp
+        }
+        
+        tmpQ = Question.newQuestion(record)
+
+        task = long_running_task.apply_async(args=[json_dict['prompt']])
+        
+        response = make_response(jsonify({'task_id': task.id,'question_id':tmpQ.question_id}), 202)
+        return response
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return make_response(jsonify({'error': 'Internal Server Error'}), 500)
+
+@app.route('/api/user/chat/result/<task_id>', methods=['GET'])
+def get_result(task_id):
+    task = long_running_task.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'current': 0,
+            'status': 'Pending...'
+        }
+    elif task.state != 'FAILURE':
+        response = {
+            'state': task.state,
+            'current': 100,
+            'status': 'Task completed!',
+            'result': task.result
+        }
+    else:
+        response = {
+            'state': task.state,
+            'current': 100,
+            'status': str(task.info)
+        }
+    return jsonify(response)
+
+#celery
+@celery.task
+def long_running_task(prompt):
+    response_text = test.ask(prompt)
+    return response_text
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=8001, threaded=True)
