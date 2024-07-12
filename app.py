@@ -685,7 +685,6 @@ def get_answer(questionId):
 # user api
 
 @app.route('/api/user/chat/', methods=['POST'])
-@login_required
 def prompting():
     if request.method == 'POST':
         json_dict = request.get_json()
@@ -694,7 +693,9 @@ def prompting():
         request_header = dict(request.headers)
         request_data = json_dict
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(current_user.id)
+        if current_user == None:
+            current_user = User()
+            current_user.id = 1000
         # Record the data
         record = {
             'user_id': current_user.id,
