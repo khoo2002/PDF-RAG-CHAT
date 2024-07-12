@@ -25,7 +25,7 @@ def generate(question, question_id):
     return response_text
 
 if __name__ == "__main__":
-    thread = Thread(target = generate, args = (sys.argv[3],sys.argv[4] ))
+    thread = Thread(target = generate, args = (sys.argv[2],sys.argv[3] ))
     thread.start()
     thread.join()
     print("thread finished...exiting")
