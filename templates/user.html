@@ -299,7 +299,9 @@ function sendMessage() {
         waitForResponse();
         console.log("I am still waiting.");
         if(question_id!=-1){
-            loopFunctionWithInterval(loopGetAnswer(question_id));
+            while (!loopGetAnswer(question_id)){
+                var hi = "I am hi";
+            }
         }
     }
 }
