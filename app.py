@@ -139,7 +139,7 @@ class Question():
                 question_dict['feedback'] = None
             
             questions.append(question_dict)
-
+            conn.close()
         return {'questions': questions, 'total_pages': total_pages}
 
     def newQuestion(question_dict):
