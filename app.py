@@ -711,7 +711,7 @@ def prompting():
         
         tmpQ = Question.newQuestion(record)
         print('start prompting')
-        subprocess.Popen(["python3", "prompting.py", f"'{tmpQ.question}'", tmpQ.question_id], close_fds=True)
+        subprocess.Popen(["python3", "prompting.py", f"'{tmpQ.question}'", f"{tmpQ.question_id}"], close_fds=True)
         print("I dont want to wait")
         # response_text = test.ask(json_dict['prompt'])
         # print(response_text)
