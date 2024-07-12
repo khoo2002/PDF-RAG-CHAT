@@ -353,15 +353,16 @@ function sendToBackend(message) {
             if (this.status == 200) {
                 var responseText = this.responseText;
                 var responseData = JSON.parse(responseText);
-                console.log(responseData)
-                return responseData.question_id
+                console.log(responseData);
+                console.log(responseData.question_id);
+                return responseData.question_id;
                 // waitDone();
                 // displaySystemMessage(responseData.answer_text);
                 // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
             } else {
                 waitDone();
                 displaySystemMessage("Failed to get response from the backend.");
-                return -1
+                return -1;
             }
         }
     };
