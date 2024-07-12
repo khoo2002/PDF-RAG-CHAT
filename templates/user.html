@@ -295,7 +295,7 @@ function sendMessage() {
     var userInput = document.getElementById('userInput').value;
     if (userInput.trim() !== '') {
         displayUserMessage(userInput);
-        sendToBackend(userInput);
+        var question_id = sendToBackend(userInput);
         waitForResponse();
         console.log("I am still waiting.");
         if(question_id!=-1){
@@ -393,7 +393,7 @@ function loopGetAnswer(question_id) {
                 return true;
             }
         };
-    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), true);
+    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), false);
     xhttp.send();
 }
 
