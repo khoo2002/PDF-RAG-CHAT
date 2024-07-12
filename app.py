@@ -721,7 +721,8 @@ def prompting():
         answer = Answer.get_answer(tmpQ.question_id)
         answer_id = answer['answer'][0]['answer_id']
         print('done')
-        return jsonify({'answer_text': response_text, 'answer_id': answer_id}), 200
+        return "Good Request", 200
+        # return jsonify({'answer_text': response_text, 'answer_id': answer_id}), 200
     else:
         return "Bad Request", 404
     
