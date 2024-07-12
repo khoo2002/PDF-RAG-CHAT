@@ -362,7 +362,7 @@ function sendToBackend(message,callback) {
                 console.log(responseData);
                 console.log(responseData.question_id);
                 
-                callback(responseData.question_id);
+                return responseData.question_id;
                 // waitDone();
                 // displaySystemMessage(responseData.answer_text);
                 // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
@@ -373,7 +373,7 @@ function sendToBackend(message,callback) {
             }
         }
     };
-    xhttp.open("POST", localUrl("/api/user/chat/"), false);
+    xhttp.open("POST", localUrl("/api/user/chat/"), true);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     console.log(message);
     var requestData = { prompt: message };
