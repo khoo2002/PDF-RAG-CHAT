@@ -840,7 +840,7 @@ def prompting():
 
 @app.route('/api/user/chat/result/<task_id>', methods=['GET'])
 def get_result(task_id):
-    test = TestingChat()
+
     task = long_running_task.AsyncResult(task_id)
     if task.state == 'PENDING':
         response = {
@@ -866,6 +866,7 @@ def get_result(task_id):
 #celery
 @celery.task
 def long_running_task(prompt,question_id):
+    test = TestingChat()
     response_text = test.ask(prompt)
     answer_record = {
             'question_id': question_id,  # Use the same question ID as the question
