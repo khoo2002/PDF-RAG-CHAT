@@ -197,6 +197,7 @@ class Question():
             tmQ.setter(result[1], result[2], result[3], result[4], result[5], result[6], result[7], result[0])
             return tmQ
         return None
+    
         
 
 # user
@@ -740,7 +741,7 @@ def getAnswer(question_id):
             response = make_response(jsonify({'answer': answer_content}), 200)
             return response
         except Exception:
-            return "Bad Request", 402
+            return "Still waiting", 209
     else:
         return "Bad Request", 404
 
