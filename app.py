@@ -728,7 +728,22 @@ def prompting():
         return response
     else:
         return "Bad Request", 404
-    
+
+@app.route('/api/user/chat/getAnswer/<int:question_id>', methods=['GET'])
+def getAnswer(question_id):
+    if request.method == 'GET':
+        try:
+            answer = Answer.get_answer(question_id)
+            answer_id = answer['answer'][0]['answer_id']
+            answer_content = answer['answer'][0]['answer_text']
+            print('done')
+            response = make_response(jsonify({'answer': answer_content}), 200)
+            return response
+        except Exception:
+            return "Bad Request", 402
+    else:
+        return "Bad Request", 404
+
 
 @app.route('/api/user/feedback/', methods=['POST'])
 @login_required
