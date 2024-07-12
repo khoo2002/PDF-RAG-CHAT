@@ -296,8 +296,7 @@ function sendMessage() {
     if (userInput.trim() !== '') {
         displayUserMessage(userInput);
         waitForResponse();
-        var question_id = sendToBackend(userInput);
-        console.log(question_id);
+        console.log(sendToBackend(userInput));
         waitForResponse();
         console.log("I am still waiting.");
         if(question_id!=-1){
