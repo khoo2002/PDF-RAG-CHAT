@@ -390,54 +390,54 @@ INSERT INTO users VALUES (nextval('seq_userid'),'admin', 'adminMCMC123', 'admin'
 """.format(timestamp=datetime.datetime.now().isoformat())).fetchall()
 conn.close()
 
-conn = duckdb.connect(DATABASE_PATH)
-result = conn.execute("""
-Select * from users;
-""").fetchall()
-conn.close()
-print("")
-print("Users:")
-print(result)
+# conn = duckdb.connect(DATABASE_PATH)
+# result = conn.execute("""
+# Select * from users;
+# """).fetchall()
+# conn.close()
+# print("")
+# print("Users:")
+# print(result)
 
-conn = duckdb.connect(DATABASE_PATH)
-result = conn.execute("""
-Select * from questions;
-""").fetchall()
-conn.close()
-print()
-print("Questions:")
-print(result)
-print()
-print()
-print()
-print()
+# conn = duckdb.connect(DATABASE_PATH)
+# result = conn.execute("""
+# Select * from questions;
+# """).fetchall()
+# conn.close()
+# print()
+# print("Questions:")
+# print(result)
+# print()
+# print()
+# print()
+# print()
 
-conn = duckdb.connect(DATABASE_PATH)
-result = conn.execute("""
-Select * from answers;
-""").fetchall()
-conn.close()
-print()
-print("Answers:")
-print(result)
-print()
-print()
-print()
-print()
+# conn = duckdb.connect(DATABASE_PATH)
+# result = conn.execute("""
+# Select * from answers;
+# """).fetchall()
+# conn.close()
+# print()
+# print("Answers:")
+# print(result)
+# print()
+# print()
+# print()
+# print()
 
 
-conn = duckdb.connect(DATABASE_PATH)
-result = conn.execute("""
-Select * from feedback;
-""").fetchall()
-conn.close()
-print()
-print("Feedback:")
-print(result)
-print()
-print()
-print()
-print()
+# conn = duckdb.connect(DATABASE_PATH)
+# result = conn.execute("""
+# Select * from feedback;
+# """).fetchall()
+# conn.close()
+# print()
+# print("Feedback:")
+# print(result)
+# print()
+# print()
+# print()
+# print()
 
 
 # variable
