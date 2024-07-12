@@ -13,7 +13,7 @@ def generate(question, question_id):
     print(response_text)
     # Store the answer
     answer_record = {
-        'question_id': self.question_id,  # Use the same question ID as the question
+        'question_id': question_id,  # Use the same question ID as the question
         'answer_text': response_text,
         'created_at': timestamp
     }

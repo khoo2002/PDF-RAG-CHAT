@@ -9,6 +9,7 @@ import duckdb
 import time
 from rag import TestingChat
 import json
+import subprocess
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
