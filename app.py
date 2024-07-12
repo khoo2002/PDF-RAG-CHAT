@@ -788,4 +788,4 @@ async def generating(model,prompt):
     
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=8001, threaded=True)
+    app.run(host="0.0.0.0",debug=True, port=8001, threaded=True)
