@@ -351,7 +351,7 @@ function waitDone() {
 }
 
 
-function sendToBackend(message) {
+function sendToBackend(message,callback) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
     xhttp.onreadystatechange = function() {
@@ -362,7 +362,7 @@ function sendToBackend(message) {
                 console.log(responseData);
                 console.log(responseData.question_id);
                 
-                return responseData.question_id;
+                callback(responseData.question_id);
                 // waitDone();
                 // displaySystemMessage(responseData.answer_text);
                 // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
@@ -379,6 +379,7 @@ function sendToBackend(message) {
     var requestData = { prompt: message };
     console.log(requestData);
     xhttp.send(JSON.stringify(requestData));
+    
 }
 
 function loopGetAnswer(question_id) {
