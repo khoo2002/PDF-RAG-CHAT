@@ -351,7 +351,7 @@ function waitDone() {
 }
 
 
-function sendToBackend(message,callback) {
+function sendToBackend(message) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
     xhttp.onreadystatechange = function() {
@@ -362,7 +362,14 @@ function sendToBackend(message,callback) {
                 console.log(responseData);
                 console.log(responseData.question_id);
                 
-                return responseData.question_id;
+                if (question_id !== -1) {
+                    var intervalId = setInterval(function() {
+                        var result = loopGetAnswer(question_id);
+                        if (result === true) {
+                            clearInterval(intervalId); // Stop the interval
+                        }
+                    }, 30000); // 30000 milliseconds = 30 seconds
+                }
                 // waitDone();
                 // displaySystemMessage(responseData.answer_text);
                 // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
@@ -386,6 +393,7 @@ function loopGetAnswer(question_id) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
     xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
             if (this.status == 200) {
                 var responseText = this.responseText;
                 var responseData = JSON.parse(responseText);
@@ -401,7 +409,8 @@ function loopGetAnswer(question_id) {
                 displaySystemMessage("Failed to get response from the backend.");
                 return true;
             }
-        };
+        }
+    };
     xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), false);
     xhttp.send();
 }
