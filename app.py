@@ -840,6 +840,7 @@ def prompting():
 
 @app.route('/api/user/chat/result/<task_id>', methods=['GET'])
 def get_result(task_id):
+    test = TestingChat()
     task = long_running_task.AsyncResult(task_id)
     if task.state == 'PENDING':
         response = {
