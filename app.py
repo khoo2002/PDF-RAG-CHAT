@@ -9,6 +9,8 @@ import duckdb
 import time
 from rag import TestingChat
 import json
+import threading
+import asyncio
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
@@ -708,8 +710,10 @@ def prompting():
         }
         
         tmpQ = Question.newQuestion(record)
-
-        response_text = test.ask(json_dict['prompt'])
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        loop = asyncio.get_event_loop()
+        response_text = loop.run_until_complete(generating(test,json_dict['prompt']))
+        # response_text = test.ask(json_dict['prompt'])
         print(response_text)
         # Store the answer
         answer_record = {
@@ -778,6 +782,10 @@ def get_feedback_for_answer(answer_id):
 
     else:
         return "Bad Request", 404
+
+async def generating(model,prompt):
+    return model.ask(prompt)
+    
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=False, port=8001, threaded=True)
