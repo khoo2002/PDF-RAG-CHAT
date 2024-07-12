@@ -297,6 +297,8 @@ function sendMessage() {
         displayUserMessage(userInput);
         waitForResponse();
         var question_id = sendToBackend(userInput);
+        waitForResponse();
+        console.log("I am still waiting.")
         if(question_id!=-1){
             loopFunctionWithInterval(loopGetAnswer(question_id));
         }
