@@ -299,13 +299,18 @@ function sendMessage() {
         console.log(question_id);
         waitForResponse();
         console.log("I am still waiting.");
-        if(question_id!=-1){
-            while (!loopGetAnswer(question_id)){
-                var hi = "I am hi";
-            }
+
+        if (question_id !== -1) {
+            var intervalId = setInterval(function() {
+                var result = loopGetAnswer(question_id);
+                if (result === true) {
+                    clearInterval(intervalId); // Stop the interval
+                }
+            }, 30000); // 30000 milliseconds = 30 seconds
         }
     }
 }
+
 
 function displayUserMessage(message) {
     var chatBox = document.getElementById('chatBox');
