@@ -296,7 +296,10 @@ function sendMessage() {
     if (userInput.trim() !== '') {
         displayUserMessage(userInput);
         waitForResponse();
-        sendToBackend(userInput);
+        var question_id = sendToBackend(userInput);
+        if(question_id!=-1){
+            loopFunctionWithInterval(loopGetAnswer(question_id));
+        }
     }
 }
 
@@ -347,12 +350,14 @@ function sendToBackend(message) {
             if (this.status == 200) {
                 var responseText = this.responseText;
                 var responseData = JSON.parse(responseText);
-                waitDone();
-                displaySystemMessage(responseData.answer_text);
-                addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+                return responseData.question_id
+                // waitDone();
+                // displaySystemMessage(responseData.answer_text);
+                // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
             } else {
                 waitDone();
                 displaySystemMessage("Failed to get response from the backend.");
+                return -1
             }
         }
     };
@@ -363,6 +368,46 @@ function sendToBackend(message) {
     console.log(requestData);
     xhttp.send(JSON.stringify(requestData));
 }
+
+function loopGetAnswer(question_id) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.onreadystatechange = function() {
+            if (this.status == 200) {
+                var responseText = this.responseText;
+                var responseData = JSON.parse(responseText);
+                waitDone();
+                displaySystemMessage(responseData.answer_text);
+                addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+                return true
+            }else if(this.status=209){
+                // waitDone();
+                return false
+            } else {
+                waitDone();
+                displaySystemMessage("Failed to get response from the backend.");
+                return true
+            }
+        };
+    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), true);
+    xhttp.send();
+}
+
+function loopFunctionWithInterval(fn) {
+    function executeFunction() {
+        const result = fn();
+        if (result === true) {
+            console.log("Function returned true, stopping the loop.");
+            return; // Stop the loop
+        } else {
+            console.log("Function returned false, continuing the loop.");
+            setTimeout(executeFunction, 1000); // Continue the loop after 30 seconds
+        }
+    }
+    // Start the loop
+    executeFunction();
+}
+
 
 function addAnswerId(answerId) {
     var lastMessage = document.querySelector('.chat-message:last-child');
