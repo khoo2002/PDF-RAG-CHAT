@@ -353,6 +353,7 @@ function sendToBackend(message) {
             if (this.status == 200) {
                 var responseText = this.responseText;
                 var responseData = JSON.parse(responseText);
+                console.log(responseData)
                 return responseData.question_id
                 // waitDone();
                 // displaySystemMessage(responseData.answer_text);
