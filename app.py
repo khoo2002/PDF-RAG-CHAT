@@ -693,7 +693,7 @@ def prompting():
         request_header = dict(request.headers)
         request_data = json_dict
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        if current_user == None:
+        if 'current_user' not in locals():
             current_user = User()
             current_user.id = 1000
         # Record the data
