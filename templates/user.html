@@ -295,8 +295,7 @@ function sendMessage() {
     var userInput = document.getElementById('userInput').value;
     if (userInput.trim() !== '') {
         displayUserMessage(userInput);
-        waitForResponse();
-        console.log(sendToBackend(userInput));
+        sendToBackend(userInput);
         waitForResponse();
         console.log("I am still waiting.");
         if(question_id!=-1){
@@ -354,6 +353,7 @@ function sendToBackend(message) {
                 var responseData = JSON.parse(responseText);
                 console.log(responseData);
                 console.log(responseData.question_id);
+                
                 return responseData.question_id;
                 // waitDone();
                 // displaySystemMessage(responseData.answer_text);
@@ -365,7 +365,7 @@ function sendToBackend(message) {
             }
         }
     };
-    xhttp.open("POST", localUrl("/api/user/chat/"), true);
+    xhttp.open("POST", localUrl("/api/user/chat/"), false);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     console.log(message);
     var requestData = { prompt: message };
