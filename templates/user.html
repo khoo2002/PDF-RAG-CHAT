@@ -384,14 +384,14 @@ function loopGetAnswer(question_id) {
                 waitDone();
                 displaySystemMessage(responseData.answer_text);
                 addAnswerId(responseData.answer_id); // Add answer_id to the chat message
-                return true
+                return true;
             }else if(this.status=209){
                 // waitDone();
-                return false
+                return false;
             } else {
                 waitDone();
                 displaySystemMessage("Failed to get response from the backend.");
-                return true
+                return true;
             }
         };
     xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), true);
