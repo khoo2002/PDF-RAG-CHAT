@@ -738,7 +738,7 @@ def getAnswer(question_id):
             answer_id = answer['answer'][0]['answer_id']
             answer_content = answer['answer'][0]['answer_text']
             print('done')
-            response = make_response(jsonify({'answer': answer_content}), 200)
+            response = make_response(jsonify({'answer_id': answer_id,'answer_text': answer_content}), 200)
             return response
         except Exception:
             return "Still waiting", 209
