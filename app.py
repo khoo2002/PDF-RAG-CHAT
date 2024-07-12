@@ -818,7 +818,7 @@ def prompting():
         
         tmpQ = Question.newQuestion(record)
 
-        task = long_running_task.apply_async(args=[json_dict['prompt']])
+        task = long_running_task.apply_async(args=[json_dict['prompt'],tmpQ.question_id])
         
         response = make_response(jsonify({'task_id': task.id,'question_id':tmpQ.question_id}), 202)
         return response
@@ -853,8 +853,17 @@ def get_result(task_id):
 
 #celery
 @celery.task
-def long_running_task(prompt):
+def long_running_task(prompt,question_id):
     response_text = test.ask(prompt)
+    answer_record = {
+            'question_id': question_id,  # Use the same question ID as the question
+            'answer_text': response_text,
+            'created_at': timestamp
+        }
+    answer = Answer.store_answer(answer_record)
+    answer = Answer.get_answer(question_id)
+    answer_id = answer['answer'][0]['answer_id']
+    print('done')
     return response_text
 
 if __name__ == '__main__':
