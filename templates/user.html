@@ -299,15 +299,6 @@ function sendMessage() {
         console.log(question_id);
         waitForResponse();
         console.log("I am still waiting.");
-
-        if (question_id !== -1) {
-            var intervalId = setInterval(function() {
-                var result = loopGetAnswer(question_id);
-                if (result === true) {
-                    clearInterval(intervalId); // Stop the interval
-                }
-            }, 30000); // 30000 milliseconds = 30 seconds
-        }
     }
 }
 
@@ -362,9 +353,9 @@ function sendToBackend(message) {
                 console.log(responseData);
                 console.log(responseData.question_id);
                 
-                if (question_id !== -1) {
+                if (responseData.question_id !== -1) {
                     var intervalId = setInterval(function() {
-                        var result = loopGetAnswer(question_id);
+                        var result = loopGetAnswer(responseData.question_id);
                         if (result === true) {
                             clearInterval(intervalId); // Stop the interval
                         }
