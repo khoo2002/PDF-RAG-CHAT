@@ -779,4 +779,4 @@ def get_feedback_for_answer(answer_id):
         return "Bad Request", 404
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True, port=8001)
+    app.run(host="0.0.0.0",debug=True, port=8001, threaded=True)
