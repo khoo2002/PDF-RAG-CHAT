@@ -709,20 +709,22 @@ def prompting():
         }
         
         tmpQ = Question.newQuestion(record)
-
-        response_text = test.ask(json_dict['prompt'])
-        print(response_text)
-        # Store the answer
-        answer_record = {
-            'question_id': tmpQ.question_id,  # Use the same question ID as the question
-            'answer_text': response_text,
-            'created_at': timestamp
-        }
-        answer = Answer.store_answer(answer_record)
-        answer = Answer.get_answer(tmpQ.question_id)
-        answer_id = answer['answer'][0]['answer_id']
-        print('done')
-        response = make_response(jsonify({'answer_text': response_text, 'answer_id': answer_id}), 200)
+        print('start prompting')
+        subprocess.Popen(f"python3 prompting.py '{tmpQ.question}' {tmpQ.question_id}", close_fds=True)
+        print("I dont want to wait")
+        # response_text = test.ask(json_dict['prompt'])
+        # print(response_text)
+        # # Store the answer
+        # answer_record = {
+        #     'question_id': tmpQ.question_id,  # Use the same question ID as the question
+        #     'answer_text': response_text,
+        #     'created_at': timestamp
+        # }
+        # answer = Answer.store_answer(answer_record)
+        # answer = Answer.get_answer(tmpQ.question_id)
+        # answer_id = answer['answer'][0]['answer_id']
+        # print('done')
+        response = make_response(jsonify({'question_id': tmpQ.question_id}), 200)
         return response
     else:
         return "Bad Request", 404
