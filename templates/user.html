@@ -394,7 +394,7 @@ function loopGetAnswer(question_id) {
                 displaySystemMessage(responseData.answer_text);
                 addAnswerId(responseData.answer_id); // Add answer_id to the chat message
                 console.log("loopGetAnswer Debug 1: true");
-                return true;
+                return responseData.answer_id;
             }else if(this.status=209){
                 // waitDone();
                 console.log("loopGetAnswer Debug 1: false");
