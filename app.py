@@ -552,6 +552,11 @@ def questionlog():
         return redirect(url_for("home"))
     return render_template("question.html")
 
+@app.route("/chatdemo" , methods=["GET"])
+def chatdemo():
+    return render_template("chatDemo.html")
+
+
 # API
 @app.route('/api/admin/file/upload', methods=['POST','GET'])
 def upload_file():
