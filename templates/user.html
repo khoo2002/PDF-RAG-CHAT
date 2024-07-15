@@ -356,6 +356,7 @@ function sendToBackend(message) {
                 if (responseData.question_id !== -1) {
                     var intervalId = setInterval(function() {
                         var result = loopGetAnswer(responseData.question_id);
+                        console.log("sendToBackend Debug 1: " + result);
                         if (result === true) {
                             clearInterval(intervalId); // Stop the interval
                         }
@@ -391,13 +392,16 @@ function loopGetAnswer(question_id) {
                 waitDone();
                 displaySystemMessage(responseData.answer_text);
                 addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+                console.log("loopGetAnswer Debug 1: true");
                 return true;
             }else if(this.status=209){
                 // waitDone();
+                console.log("loopGetAnswer Debug 1: false");
                 return false;
             } else {
                 waitDone();
                 displaySystemMessage("Failed to get response from the backend.");
+                console.log("loopGetAnswer Debug 1.5: true");
                 return true;
             }
         }
