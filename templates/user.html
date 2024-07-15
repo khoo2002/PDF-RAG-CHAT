@@ -356,8 +356,9 @@ function sendToBackend(message) {
                 if (responseData.question_id !== -1) {
                     var intervalId = setInterval(function() {
                         var result = loopGetAnswer(responseData.question_id);
-                        result = findChatMessageById(responseData.question_id);
                         console.log("sendToBackend Debug 1: " + result);
+                        result = findChatMessageById(responseData.question_id);
+                        console.log("sendToBackend Debug 1.5: " + result);
                         if (result === true) {
                             clearInterval(intervalId); // Stop the interval
                         }
