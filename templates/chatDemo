@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px;
+            position: relative;
+        }
+        .title {
+            font-size: 24px;
+            margin-right: auto;
+        }
+        .chat-popup {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            border: 3px solid #f1f1f1;
+            z-index: 9;
+            border-radius: 10px;
+        }
+        /* .form-container {
+            max-width: 300px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 10px;
+        } */
+
+        .iframecontainer {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            /* width: 100%; */
+            overflow: hidden;
+            /* padding-top: 177.77%; 16:9 Aspect Ratio */
+            }
+
+            .responsive-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            }
+
+            img {
+            height: auto;
+            width: 60px;
+            border-radius: 50%;
+            border-style: solid;
+            border-color: rgb(38, 148, 207);
+            }
+            .chat-btn{
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="title">MCMC DEMO</span>
+        <h1>`SafeBot` chat</h1>
+
+        <div class="chat-btn">
+            <img class="img" onclick="callChat()" src="https://www.iicom.org/wp-content/uploads/MCMC-New-Logo_Colour.png">
+        </div>
+        
+    </div>
+
+    <div class="chat-popup" id="chatPopup">
+        <div>
+            <h3 style="padding-left: 10px;">Safe Bot</h3>
+        </div>        
+        <div class="form-container iframecontainer">
+            <iframe class="responsive-iframe" src="C:/Users/khooz/Downloads/Internship/testing.html"></iframe>
+
+        </div>
+    </div>
+
+    <div class="loading-ui" id="loadingUI" style="display: none;">
+        <div id="loading">
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <script>
+        function callChat(){
+            if(document.getElementById('chatPopup').style.display == 'block'){
+                document.getElementById('chatPopup').style.display = 'none';
+            }else{
+                document.getElementById('chatPopup').style.display = 'block';
+            }
+        }
+        function openChat() {
+            document.getElementById('chatPopup').style.display = 'block';
+        }
+
+        function closeChat() {
+            document.getElementById('chatPopup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
