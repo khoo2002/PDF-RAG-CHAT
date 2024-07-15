@@ -561,7 +561,7 @@ function localUrl(api){
 function findChatMessageById(answerId) {
     const chatMessages = document.querySelectorAll('.chat-message');
     for (let i = 0; i < chatMessages.length; i++) {
-        if (chatMessages[i].getAttribute('data-answer-id') === answerId.toString()) {
+        if (chatMessages[i].getAttribute('data-question-id') === answerId.toString()) {
             return true;
         }
     }
