@@ -372,7 +372,7 @@ function sendToBackend(message) {
             }
         }
     };
-    xhttp.open("POST", localUrl("/api/user/chat/"), true);
+    xhttp.open("POST", localUrl("/api/user/chat/"), false);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     console.log(message);
     var requestData = { prompt: message };
@@ -406,7 +406,7 @@ function loopGetAnswer(question_id) {
             }
         }
     };
-    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), true);
+    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), false);
     xhttp.send();
 }
 
