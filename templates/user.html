@@ -356,7 +356,7 @@ function sendToBackend(message) {
                 if (responseData.question_id !== -1) {
                     var intervalId = setInterval(function() {
                         var result = loopGetAnswer(responseData.question_id);
-                        console.log("sendToBackend Debug 1: " + result);
+                        
                         if (result === true) {
                             clearInterval(intervalId); // Stop the interval
                         }
@@ -549,6 +549,15 @@ function localUrl(api){
             return "http://"+window.location.hostname +":"+ window.location.port + api;
         }
 
+function findChatMessageById(answerId) {
+    const chatMessages = document.querySelectorAll('.chat-message');
+    for (let i = 0; i < chatMessages.length; i++) {
+        if (chatMessages[i].getAttribute('data-answer-id') === answerId.toString()) {
+            return true;
+        }
+    }
+    return false;
+}
 </script>
 </body>
 </html>
