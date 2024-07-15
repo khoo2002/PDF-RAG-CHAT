@@ -394,6 +394,7 @@ function loopGetAnswer(question_id) {
                 waitDone();
                 displaySystemMessage(responseData.answer_text);
                 addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+                addQuestionId(question_id); // Add answer_id to the chat message
                 var answer_id = responseData.answer_id;
                 console.log("loopGetAnswer Debug 1: true");
                 return [true, answer_id];
@@ -418,7 +419,12 @@ function addAnswerId(answerId) {
     var lastMessage = document.querySelector('.chat-message:last-child');
     lastMessage.dataset.answerId = answerId;
 }
+function addQuestionId(question_id) {
+    var lastMessage = document.querySelector('.chat-message:last-child');
+    lastMessage.dataset.questionId = question_id;
+}
 
+        
 var feedbackForm = null;
 
 function submitFeedback(button, type, reason) {
