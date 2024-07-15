@@ -89,7 +89,7 @@
             <h3 style="padding-left: 10px;">Safe Bot</h3>
         </div>        
         <div class="form-container iframecontainer">
-            <iframe class="responsive-iframe" src="C:/Users/khooz/Downloads/Internship/testing.html"></iframe>
+            <iframe class="responsive-iframe"></iframe>
 
         </div>
     </div>
@@ -115,6 +115,20 @@
         function closeChat() {
             document.getElementById('chatPopup').style.display = 'none';
         }
+
+        function setIframeSrc(src) {
+            const iframe = document.querySelector('.responsive-iframe');
+            if (iframe) {
+                iframe.setAttribute('src', src);
+            } else {
+                console.error('No element found with the class "responsive-iframe".');
+            }
+        }
+        
+        function localUrl(api){
+            return "http://"+window.location.hostname +":"+ window.location.port + api;
+        }
+        setIframeSrc(localUrl('/chatdemo'));
     </script>
 </body>
 </html>
