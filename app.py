@@ -531,10 +531,10 @@ def adminHalo():
     return render_template("admin.html")
 
 @app.get("/user")
-@login_required
+# @login_required
 def userHalo():
-    if current_user.role!= "admin" and current_user.role!= "user":
-        return redirect(url_for("login"))
+    # if current_user.role!= "admin" and current_user.role!= "user":
+    #     return redirect(url_for("login"))
     return render_template("user.html")
 
 @app.route("/get_my_ip", methods=["GET"])
