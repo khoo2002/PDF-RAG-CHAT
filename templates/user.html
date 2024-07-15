@@ -406,7 +406,7 @@ function loopGetAnswer(question_id) {
             }
         }
     };
-    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), false);
+    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), true);
     xhttp.send();
 }
 
