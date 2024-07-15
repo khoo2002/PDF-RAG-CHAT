@@ -557,7 +557,7 @@ def chatdemo():
     return render_template("chatDemo.html")
 
 @app.route("/chatbot" , methods=["GET"])
-def chatdemo():
+def chatbot():
     return render_template("chatbot.html")
 
 # API
