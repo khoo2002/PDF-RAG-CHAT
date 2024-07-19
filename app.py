@@ -667,11 +667,9 @@ def file_ingest():
         chunks = filter_complex_metadata(chunks)  # Assuming this function is defined elsewhere
         print(f"Number of chunks: {len(chunks)}")
         mil.add_documents(chunks)
-        path = os.path.join(path, '')
         # Define the destination directory
         # Create the destination directory if it doesn't exist
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    
         # Iterate over files in the source directory
         for filename in os.listdir(UNINGEST_FOLDER):
             # Check if the current item is a file
@@ -682,6 +680,7 @@ def file_ingest():
                     print(f"Moved {filename} to {UPLOAD_FOLDER}")
                 except Exception as e:
                     print(f"Failed to move {filename}: {e}")
+                    
         ingesting = False
         response = make_response("Ingesting done!", 200)
         return response
