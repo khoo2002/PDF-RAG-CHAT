@@ -18,6 +18,8 @@ import json
 import subprocess
 import time
 
+import shutil
+
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
 if os.path.exists(PARENT_DATABASE) != True:
