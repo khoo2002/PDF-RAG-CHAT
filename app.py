@@ -13,6 +13,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 import datetime
 import os
 import duckdb
+import shutil
 import time
 from rag import TestingChat
 import json
