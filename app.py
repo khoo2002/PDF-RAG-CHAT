@@ -666,8 +666,6 @@ def file_ingest():
         chunks = filter_complex_metadata(chunks)  # Assuming this function is defined elsewhere
         print(f"Number of chunks: {len(chunks)}")
         mil.add_documents(chunks)
-        path = os.path.join(path, '')
-        # Define the destination directory
         # Create the destination directory if it doesn't exist
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     
