@@ -10,6 +10,7 @@ import time
 from rag import TestingChat
 import json
 import subprocess
+import time
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
@@ -716,8 +717,19 @@ def prompting():
            'request_data': json.dumps(request_data),
             'created_at': timestamp
         }
-        
+
+        # Measure execution time
+        start_time = time.time()
+
         tmpQ = Question.newQuestion(record)
+        
+        # Calculate elapsed time
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        
+        # Print the elapsed time
+        print(f"Store Question log - Elapsed time: {elapsed_time} seconds")
+
         print('start prompting')
         subprocess.Popen(["python3", "prompting.py", f"'{tmpQ.question}'", f"{tmpQ.question_id}"], close_fds=True)
         print("I dont want to wait")
