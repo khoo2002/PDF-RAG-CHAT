@@ -464,12 +464,12 @@ ingesting = False
 
 test = TestingChat()
 
-@app.before_request
-def limit_access():
-    if request.remote_addr not in ['127.0.0.1', '192.168.0.0/16', '10.0.0.0/8']:  # Add your local network IP ranges here
-        return 'Access denied', 403
-    if ingesting:
-        return 'Services will return soon. Try again later!', 503
+# @app.before_request
+# def limit_access():
+#     if request.remote_addr not in ['127.0.0.1', '192.168.0.0/16', '10.0.0.0/8']:  # Add your local network IP ranges here
+#         return 'Access denied', 403
+#     if ingesting:
+#         return 'Services will return soon. Try again later!', 503
 
 
 # Login & Authentication
@@ -844,4 +844,4 @@ def get_feedback_for_answer(answer_id):
         return "Bad Request", 404
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=8001, threaded=True)
+    app.run(host="0.0.0.0",debug=True, port=6700, threaded=True)
