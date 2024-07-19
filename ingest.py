@@ -6,11 +6,17 @@ from langchain_community.document_loaders import PyPDFDirectoryLoader
 import sys
 import duckdb
 import os
+import shutil
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
+UPLOAD_FOLDER = '../uploaded'
+
 if os.path.exists(PARENT_DATABASE) != True:
     os.mkdir(PARENT_DATABASE)
+    
+if os.path.exists(UPLOAD_FOLDER) != True:
+    os.mkdir(UPLOAD_FOLDER)
 
 def list_pdf_filenames(path):
     """
@@ -65,14 +71,28 @@ def ingest_from_path(paths):
         mil.add_documents(chunks)
         print("Ingest done for path:", path)
         pdf_files = list_pdf_filenames(path)
+        
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        # Iterate over files in the source directory
+        for filename in pdf_files:
+            # Check if the current item is a file
+            if os.path.isfile(os.path.join(path, filename)):
+                try:
+                    # Move the file to the destination directory
+                    shutil.move(os.path.join(path, filename), os.path.join(UPLOAD_FOLDER, filename))
+                    print(f"Moved {filename} to {UPLOAD_FOLDER}")
+                except Exception as e:
+                    print(f"Failed to move {filename}: {e}")
+                    
         for file in pdf_files:
             conn = duckdb.connect(DATABASE_PATH)
             conn.execute("""
             INSERT INTO pdf_files 
             VALUES (nextval('seq_fileid'),'{file_path}', '{file_name}')
             ON CONFLICT (id) DO NOTHING;
-            """.format(file_path = os.path.join(path,file), file_name = file))
+            """.format(file_path = os.path.join(UPLOAD_FOLDER,file), file_name = file))
             conn.close()
+    
     return True
 
 if __name__ == '__main__':
