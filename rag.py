@@ -473,6 +473,7 @@ class TestingChat:
                             | self.llama3Prompt
                             | self.llama3Model
                             | StrOutputParser())
+        
         return self.llama3Chain.invoke(query)
 
     # #PHI3
