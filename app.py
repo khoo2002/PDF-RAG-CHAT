@@ -450,8 +450,10 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 UPLOAD_FOLDER = '../uploaded'
+UNINGEST_FOLDER = '../uningest'
 ALLOWED_EXTENSIONS = {'pdf'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UNINGEST_FOLDER'] = UNINGEST_FOLDER
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 if os.path.exists(UPLOAD_FOLDER) != True:
@@ -562,7 +564,7 @@ def chatbot():
     return render_template("chatbot.html")
 
 # API
-@app.route('/api/admin/file/upload', methods=['POST','GET'])
+@app.route('/api/admin/file/upload', methods=['POST'])
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -577,7 +579,7 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['UNINGEST_FOLDER'], filename))
             conn = duckdb.connect(DATABASE_PATH)
             conn.execute("""
             INSERT INTO pdf_files 
