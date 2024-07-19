@@ -4,6 +4,7 @@ from app import Answer
 import datetime
 from threading import Thread
 import sys
+import time
 
 
 def generate(question, question_id):
@@ -17,8 +18,28 @@ def generate(question, question_id):
         'answer_text': response_text,
         'created_at': timestamp
     }
+    # Measure execution time
+    start_time = time.time()
+
     answer = Answer.store_answer(answer_record)
+    # Calculate elapsed time
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    
+    # Print the elapsed time
+    print(f"Store Answer log - Elapsed time: {elapsed_time} seconds")
+
+    # Measure execution time
+    start_time = time.time()
+
     answer = Answer.get_answer(question_id)
+    # Calculate elapsed time
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    
+    # Print the elapsed time
+    print(f"Verified answer - Elapsed time: {elapsed_time} seconds")
+
     answer_id = answer['answer'][0]['answer_id']
     print('done')
 
