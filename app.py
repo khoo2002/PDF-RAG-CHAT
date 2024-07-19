@@ -456,8 +456,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['UNINGEST_FOLDER'] = UNINGEST_FOLDER
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
-if os.path.exists(UPLOAD_FOLDER) != True:
-    os.mkdir(UPLOAD_FOLDER)
 
 if os.path.exists(UPLOAD_FOLDER) != True:
     os.mkdir(UPLOAD_FOLDER)
@@ -579,6 +577,8 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            if os.path.exists(UNINGEST_FOLDER) != True:
+                os.mkdir(UNINGEST_FOLDER)
             file.save(os.path.join(app.config['UNINGEST_FOLDER'], filename))
             conn = duckdb.connect(DATABASE_PATH)
             conn.execute("""
@@ -650,8 +650,31 @@ def delete_file(file):
 def file_ingest():
     global ingesting
     if request.method == 'GET':
-        ingesting = True
-        test.ingest()
+        #check the folder exists
+        ingesting = True    
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
+        embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+        mil = Milvus(embedding_function=embedding_model, collection_name='LangChainCollection', drop_old=False, auto_id=True)
+        docs = PyPDFDirectoryLoader(app.config['UNINGEST_FOLDER']).load()  
+        chunks = text_splitter.split_documents(docs)
+        chunks = filter_complex_metadata(chunks)  # Assuming this function is defined elsewhere
+        print(f"Number of chunks: {len(chunks)}")
+        mil.add_documents(chunks)
+        path = os.path.join(path, '')
+        # Define the destination directory
+        # Create the destination directory if it doesn't exist
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    
+        # Iterate over files in the source directory
+        for filename in os.listdir(UNINGEST_FOLDER):
+            # Check if the current item is a file
+            if os.path.isfile(os.path.join(UNINGEST_FOLDER, filename)):
+                try:
+                    # Move the file to the destination directory
+                    shutil.move(os.path.join(UNINGEST_FOLDER, filename), os.path.join(UPLOAD_FOLDER, filename))
+                    print(f"Moved {filename} to {UPLOAD_FOLDER}")
+                except Exception as e:
+                    print(f"Failed to move {filename}: {e}")
         ingesting = False
         response = make_response("Ingesting done!", 200)
         return response
