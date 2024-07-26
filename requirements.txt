@@ -4,9 +4,9 @@ Flask-HTTPAuth==4.8.0
 Flask-Login==0.6.3
 Flask-RESTful==0.3.10
 langchain==0.0.38
-langchain-community==0.2.1
-langchain-core==0.2.1
-langchain-text-splitters==0.2.0
+langchain-community==0.0.38
+langchain-core==0.0.38
+langchain-text-splitters==0.0.38
 PyPDF2==3.0.1
 gunicorn==22.0.0
 milvus==2.2.6
