@@ -31,7 +31,7 @@ This project is a Flask-based web application that allows users to register, log
 #### Install in server
 - Ollama (Installation instruction: https://ollama.com/download)
 - llama3 (Installation instruction: https://ollama.com/library/llama3)
-- jina-embeddings (Installation instruction: https://ollama.com/jina/jina-embeddings-v2-base-en)
+- nomic-embed-text (Installation instruction: (https://ollama.com/library/nomic-embed-text))
 - milvus (Installation instruction: https://milvus.io/docs/install_standalone-docker.md)
 
 ### Installation
