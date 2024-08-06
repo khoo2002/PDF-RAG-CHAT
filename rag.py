@@ -438,7 +438,7 @@ class TestingChat:
         
     "LLAMA3"
     def ask(self, query: str):
-        self.llama3Model = ChatOllama(model="llama3:latest", top_k=10, top_p=0.5, temperature=0.4)
+        self.llama3Model = ChatOllama(model="llama3.1:8b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
         self.llama3Prompt = None
         if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
