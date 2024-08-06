@@ -850,5 +850,54 @@ def get_feedback_for_answer(answer_id):
     else:
         return "Bad Request", 404
 
+
+OLLAMA_API_URL = "http://localhost:11434"
+
+@app.route('/api/ollama/', methods=['GET'])
+def list_models():
+    response = requests.get(f"{OLLAMA_API_URL}")
+    return jsonify(response.json()), response.status_code
+
+@app.route('/api/ollama/v1/models', methods=['GET'])
+def list_models():
+    response = requests.get(f"{OLLAMA_API_URL}/v1/models")
+    return jsonify(response.json()), response.status_code
+
+@app.route('/api/ollama/v1/models/<model_name>/completions', methods=['POST'])
+def get_completions(model_name):
+    data = request.json
+    response = requests.post(f"{OLLAMA_API_URL}/v1/models/{model_name}/completions", json=data)
+    return jsonify(response.json()), response.status_code
+
+@app.route('/v1/models/<model_name>/embeddings', methods=['POST'])
+def get_embeddings(model_name):
+    data = request.json
+    response = requests.post(f"{OLLAMA_API_URL}/v1/models/{model_name}/embeddings", json=data)
+    return jsonify(response.json()), response.status_code
+
+@app.route('/v1/models/<model_name>/answers', methods=['POST'])
+def get_answers(model_name):
+    data = request.json
+    response = requests.post(f"{OLLAMA_API_URL}/v1/models/{model_name}/answers", json=data)
+    return jsonify(response.json()), response.status_code
+
+@app.route('/api/ollama/v1/models/<model_name>/search', methods=['POST'])
+def get_search_results(model_name):
+    data = request.json
+    response = requests.post(f"{OLLAMA_API_URL}/v1/models/{model_name}/search", json=data)
+    return jsonify(response.json()), response.status_code
+
+@app.route('/api/ollama/v1/models/<model_name>/summaries', methods=['POST'])
+def get_summaries(model_name):
+    data = request.json
+    response = requests.post(f"{OLLAMA_API_URL}/v1/models/{model_name}/summaries", json=data)
+    return jsonify(response.json()), response.status_code
+
+@app.route('/api/ollama/v1/models/<model_name>/transcriptions', methods=['POST'])
+def get_transcriptions(model_name):
+    data = request.json
+    response = requests.post(f"{OLLAMA_API_URL}/v1/models/{model_name}/transcriptions", json=data)
+    return jsonify(response.json()), response.status_code
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=6700, threaded=True)
