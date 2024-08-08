@@ -911,44 +911,48 @@ def webhook():
     elif request.method == 'POST':
         data = request.json
 
-        # Extract the message and sender from the WhatsApp webhook payload
-        message = data['entry'][0]['changes'][0]['value']['messages'][0]
-        from_number = message['from']
-        user_message = message['text']['body']
+        # Handle different types of notifications
+        for entry in data.get('entry', []):
+            for change in entry.get('changes', []):
+                if change.get('field') == 'messages':
+                    messages = change['value'].get('messages', [])
+                    for message in messages:
+                        from_number = message['from']
+                        user_message = message['text']['body']
 
-        # Forward the message to the AI chatbot
-        chatbot_response = requests.post(CHATBOT_API_URL, json={'prompt': user_message})
-        question_id = chatbot_response.json().get('question_id')
+                        # Forward the message to the AI chatbot
+                        chatbot_response = requests.post(CHATBOT_API_URL, json={'prompt': user_message})
+                        question_id = chatbot_response.json().get('question_id')
 
-        # Loop to check the status of the answer
-        while True:
-            answer_response = requests.get(f'{CHATBOT_ANSWER_URL}{question_id}')
-            if answer_response.status_code == 209:
-                time.sleep(1)  # Wait for 1 second before checking again
-                continue
-            elif answer_response.status_code == 200:
-                chatbot_reply = answer_response.json().get('answer')
-                break
-            else:
-                chatbot_reply = "Sorry, there was an error generating the response."
-                break
+                        # Loop to check the status of the answer
+                        while True:
+                            answer_response = requests.get(f'{CHATBOT_ANSWER_URL}{question_id}')
+                            if answer_response.status_code == 209:
+                                time.sleep(1)  # Wait for 1 second before checking again
+                                continue
+                            elif answer_response.status_code == 200:
+                                chatbot_reply = answer_response.json().get('answer')
+                                break
+                            else:
+                                chatbot_reply = "Sorry, there was an error generating the response."
+                                break
 
-        # Send the chatbot's reply back to the user on WhatsApp
-        whatsapp_message = {
-            'messaging_product': 'whatsapp',
-            'to': from_number,
-            'type': 'text',
-            'text': {
-                'body': chatbot_reply
-            }
-        }
+                        # Send the chatbot's reply back to the user on WhatsApp
+                        whatsapp_message = {
+                            'messaging_product': 'whatsapp',
+                            'to': from_number,
+                            'type': 'text',
+                            'text': {
+                                'body': chatbot_reply
+                            }
+                        }
 
-        headers = {
-            'Authorization': f'Bearer {WHATSAPP_ACCESS_TOKEN}',
-            'Content-Type': 'application/json'
-        }
+                        headers = {
+                            'Authorization': f'Bearer {WHATSAPP_ACCESS_TOKEN}',
+                            'Content-Type': 'application/json'
+                        }
 
-        requests.post(WHATSAPP_API_URL, json=whatsapp_message, headers=headers)
+                        requests.post(WHATSAPP_API_URL, json=whatsapp_message, headers=headers)
 
         return jsonify({'status': 'message sent'}), 200
 
