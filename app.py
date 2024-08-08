@@ -877,6 +877,57 @@ def api_proxy(endpoint):
     response = send_request(endpoint, method, data)
     return jsonify(response)
 
+WHATSAPP_API_URL = 'https://graph.facebook.com/v17.0/{your_phone_number_id}/messages'
+WHATSAPP_ACCESS_TOKEN = 'your_temporary_access_token'
+
+CHATBOT_API_URL = 'https://bot.chatngo.net/api/user/chat/'
+CHATBOT_ANSWER_URL = 'https://bot.chatngo.net/api/user/chat/getAnswer/'
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+
+    # Extract the message and sender from the WhatsApp webhook payload
+    message = data['entry'][0]['changes'][0]['value']['messages'][0]
+    from_number = message['from']
+    user_message = message['text']['body']
+
+    # Forward the message to the AI chatbot
+    chatbot_response = requests.post(CHATBOT_API_URL, json={'prompt': user_message})
+    question_id = chatbot_response.json().get('question_id')
+
+    # Loop to check the status of the answer
+    while True:
+        answer_response = requests.get(f'{CHATBOT_ANSWER_URL}{question_id}')
+        if answer_response.status_code == 209:
+            time.sleep(1)  # Wait for 1 second before checking again
+            continue
+        elif answer_response.status_code == 200:
+            chatbot_reply = answer_response.json().get('answer')
+            break
+        else:
+            chatbot_reply = "Sorry, there was an error generating the response."
+            break
+
+    # Send the chatbot's reply back to the user on WhatsApp
+    whatsapp_message = {
+        'messaging_product': 'whatsapp',
+        'to': from_number,
+        'type': 'text',
+        'text': {
+            'body': chatbot_reply
+        }
+    }
+
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_ACCESS_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+
+    requests.post(WHATSAPP_API_URL, json=whatsapp_message, headers=headers)
+
+    return jsonify({'status': 'message sent'}), 200
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=6700, threaded=True)
