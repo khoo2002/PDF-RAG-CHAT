@@ -896,6 +896,24 @@ VERIFY_TOKEN = 'your_verify_token'  # Set this to your own verification token
 CHATBOT_API_URL = 'https://bot.chatngo.net/api/user/chat/'
 CHATBOT_ANSWER_URL = 'https://bot.chatngo.net/api/user/chat/getAnswer/'
 
+def send_whatsapp_message(to_number, message_body):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_ACCESS_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+
+    data = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "text",
+        "text": {
+            "body": message_body
+        }
+    }
+
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(response.json())
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
@@ -938,23 +956,8 @@ def webhook():
                                 break
 
                         # Send the chatbot's reply back to the user on WhatsApp
-                        whatsapp_message = {
-                            'messaging_product': 'whatsapp',
-                            'to': from_number,
-                            'type': 'text',
-                            'text': {
-                                'body': chatbot_reply
-                            }
-                        }
-
-                        headers = {
-                            'Authorization': f'Bearer {WHATSAPP_ACCESS_TOKEN}',
-                            'Content-Type': 'application/json'
-                        }
-
-                        requests.post(WHATSAPP_API_URL, json=whatsapp_message, headers=headers)
+                        send_whatsapp_message(from_number, chatbot_reply)
 
         return jsonify({'status': 'message sent'}), 200
-
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=6700, threaded=True)
