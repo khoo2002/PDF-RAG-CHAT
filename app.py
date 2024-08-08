@@ -896,7 +896,7 @@ VERIFY_TOKEN = 'your_verify_token'  # Set this to your own verification token
 CHATBOT_API_URL = 'https://bot.chatngo.net/api/user/chat/'
 CHATBOT_ANSWER_URL = 'https://bot.chatngo.net/api/user/chat/getAnswer/'
 
-def send_whatsapp_message(to_number, message_body):
+def send_whatsapp_message(to_number, message_body,message_id):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_ACCESS_TOKEN}',
         'Content-Type': 'application/json'
@@ -904,10 +904,13 @@ def send_whatsapp_message(to_number, message_body):
 
     data = {
         "messaging_product": "whatsapp",
-        "to": to_number,
+        "to": "{0}".format(to_number),
+        "context": {
+              "message_id": "{0}".format(message_id)
+        },
         "type": "text",
         "text": {
-            "body": message_body
+            "body": "{0}".format(message_body)
         }
     }
 
@@ -925,10 +928,11 @@ def webhook():
             return challenge, 200
         else:
             return 'Verification token mismatch', 403
-
     elif request.method == 'POST':
         data = request.json
-
+        print(str(data))
+        print(data)
+        print(data=='')
         # Handle different types of notifications
         for entry in data.get('entry', []):
             for change in entry.get('changes', []):
@@ -937,27 +941,29 @@ def webhook():
                     for message in messages:
                         from_number = message['from']
                         user_message = message['text']['body']
-
+                        message_id = message['id']
                         # Forward the message to the AI chatbot
                         chatbot_response = requests.post(CHATBOT_API_URL, json={'prompt': user_message})
                         question_id = chatbot_response.json().get('question_id')
-
+                        count = 1
                         # Loop to check the status of the answer
-                        while True:
+                        while count<=310:
                             answer_response = requests.get(f'{CHATBOT_ANSWER_URL}{question_id}')
                             if answer_response.status_code == 209:
-                                time.sleep(1)  # Wait for 1 second before checking again
+                                time.sleep(1)  # Wait for 1 second before checking agai
+                                count+=1
                                 continue
                             elif answer_response.status_code == 200:
-                                chatbot_reply = answer_response.json().get('answer')
+                                chatbot_reply = answer_response.json().get('answer_text')
+                                send_whatsapp_message(from_number, chatbot_reply,message_id)
                                 break
-                            else:
+                            if count >= 300:
                                 chatbot_reply = "Sorry, there was an error generating the response."
+                                send_whatsapp_message(from_number, chatbot_reply,message_id)
                                 break
-
-                        # Send the chatbot's reply back to the user on WhatsApp
-                        send_whatsapp_message(from_number, chatbot_reply)
 
         return jsonify({'status': 'message sent'}), 200
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=6700, threaded=True)
