@@ -856,7 +856,11 @@ OLLAMA_URL = "http://localhost:11434/"
 def send_request(endpoint, method, data=None):
     url = OLLAMA_URL + endpoint
     headers = {'Content-Type': 'application/json'}
-    
+    with open('content.txt','a+') as file:
+        file.write(str(url))
+        file.write('\n')
+        file.write(str(data))
+        file.write('\n')
     if method == "GET":
         response = requests.get(url, headers=headers)
     elif method == "POST":
@@ -868,15 +872,22 @@ def send_request(endpoint, method, data=None):
     else:
         return {"error": "Unsupported method"}
 
-    return response.json()
+    try:
+        response_data = response.json()
+    except ValueError:  # includes simplejson.decoder.JSONDecodeError
+        response_data = {"error": str(response.text())}
+
+    return response_data, response.status_code, {'Content-Type': 'application/json'}
 
 @app.route('/ollama/api/<path:endpoint>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def api_proxy(endpoint):
     method = request.method
-    data = request.json if method in ["POST", "PUT"] else None
-    response = send_request(endpoint, method, data)
-    return jsonify(response)
-
+    data = request.get_json() if method in ["POST", "PUT"] else None
+    response_data, status_code, headers = send_request(endpoint, method, data)
+    resp = make_response(jsonify(response_data), status_code)
+    resp.headers['Content-Type'] = headers['Content-Type']
+    return resp
+    
 WHATSAPP_API_URL = 'https://graph.facebook.com/v17.0/{your_phone_number_id}/messages'
 WHATSAPP_ACCESS_TOKEN = 'your_temporary_access_token'
 VERIFY_TOKEN = 'your_verify_token'  # Set this to your own verification token
