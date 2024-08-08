@@ -879,6 +879,7 @@ def api_proxy(endpoint):
 
 WHATSAPP_API_URL = 'https://graph.facebook.com/v17.0/{your_phone_number_id}/messages'
 WHATSAPP_ACCESS_TOKEN = 'your_temporary_access_token'
+VERIFY_TOKEN = 'your_verify_token'  # Set this to your own verification token
 
 CHATBOT_API_URL = 'https://bot.chatngo.net/api/user/chat/'
 CHATBOT_ANSWER_URL = 'https://bot.chatngo.net/api/user/chat/getAnswer/'
