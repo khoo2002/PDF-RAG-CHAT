@@ -19,6 +19,7 @@ from rag import TestingChat
 import json
 import subprocess
 import time
+import requests
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
