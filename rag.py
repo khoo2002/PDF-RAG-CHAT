@@ -372,7 +372,7 @@ class TestingChat:
         **Answer**:
         
         **Document Name**: [Insert Document Name]
-        """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
+        """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
         
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
@@ -455,14 +455,14 @@ class TestingChat:
             **Answer**:
             
             **Document Name**: [Insert Document Name]
-            """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
+            """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
         else:
             self.llama3Prompt = PromptTemplate.from_template("""
         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
         You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
         You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content.
         **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. CMA is  COMMUNICATIONS AND MULTIMEDIA
- ACT 1998. The content is below.<|eot_id|>
+ ACT 1998.<|eot_id|>
         <|start_header_id|>user<|end_header_id|>
         **Question**: {question} <|eot_id|>
         <|start_header_id|>senior staff<|end_header_id|>
@@ -583,7 +583,7 @@ class TestingChat:
             **Answer**:
             
             **Document Name**: [Insert Document Name]
-            """.format(context="{context}",adding_pack=adding_pack,question="{question}"))
+            """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
         else:
             self.llama3Prompt = PromptTemplate.from_template("""
         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
