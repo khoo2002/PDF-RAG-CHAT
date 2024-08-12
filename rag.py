@@ -442,11 +442,12 @@ class TestingChat:
         self.llama3Model = ChatOllama(model="llama3.1:8b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
         self.llama3Prompt = None
+        keywords = ["section", "cma", "communications and multimedia act"]
         if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
             self.llama3Prompt = PromptTemplate.from_template("""
             <|begin_of_text|><|start_header_id|>system<|end_header_id|>
             You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-            You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content.
+            You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
             **Context**: {context} {adding_pack}. <|eot_id|>
             <|start_header_id|>user<|end_header_id|>
             **Question**: {question} <|eot_id|>
@@ -460,7 +461,8 @@ class TestingChat:
         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
         You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
         You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content.
-        **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.<|eot_id|>
+        **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. CMA is  COMMUNICATIONS AND MULTIMEDIA
+ ACT 1998. The content is below.<|eot_id|>
         <|start_header_id|>user<|end_header_id|>
         **Question**: {question} <|eot_id|>
         <|start_header_id|>senior staff<|end_header_id|>
