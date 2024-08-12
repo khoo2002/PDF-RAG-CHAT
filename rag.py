@@ -15,7 +15,8 @@ import sys
 from PyPDF2 import PdfMerger
 import re
 # from documents import Documents
-adding_pack = """Section 1, Short title
+cma_adding_pack = """CMA is  COMMUNICATIONS AND MULTIMEDIA
+ ACT 1998. The content is below. Section 1, Short title
 Section 2, Commencement
 Section 3, Objects
 Section 4, Territorial and extra-territorial application
@@ -305,7 +306,7 @@ Section 280, Old licensees shall indicate intention
 Section 281, Registered licensee may apply for an individual licence under this Act
 Section 282, Determination of listed facilities and services
 """
-
+PM_pack = "The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now."
 UPLOAD_FOLDER = '../uploaded'
 
 class TestingChat:
@@ -446,7 +447,7 @@ class TestingChat:
             <|begin_of_text|><|start_header_id|>system<|end_header_id|>
             You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
             You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content.
-            **Context**: {context} {adding_pack}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.<|eot_id|>
+            **Context**: {context} {adding_pack}. <|eot_id|>
             <|start_header_id|>user<|end_header_id|>
             **Question**: {question} <|eot_id|>
             <|start_header_id|>senior staff<|end_header_id|>
