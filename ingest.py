@@ -6,31 +6,31 @@ from langchain_community.document_loaders import PyPDFDirectoryLoader
 import sys
 import duckdb
 import os
+import shutil  # Import shutil for file operations
 
 PARENT_DATABASE = '../database/' 
 DATABASE_PATH = '../database/testing.db'
-if os.path.exists(PARENT_DATABASE) != True:
+UPLOAD_FOLDER = '../uploaded/'
+
+
+# Ensure the directories exist
+if not os.path.exists(PARENT_DATABASE):
     os.mkdir(PARENT_DATABASE)
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.mkdir(UPLOAD_FOLDER)
 
 def list_pdf_filenames(path):
     """
-    Prints the names of all PDF files in the given directory path.
+    Returns a list of names of all PDF files in the given directory path.
     """
-    # Check if the given path is a directory
     if not os.path.isdir(path):
         print("The provided path is not a valid directory.")
-        return
+        return []
 
-    # List all files in the directory
     files = os.listdir(path)
-    
-    # Filter and print PDF files
     pdf_files = [file for file in files if file.endswith('.pdf')]
-    if pdf_files:
-        print("PDF files in the directory:")
-        return pdf_files
-    else:
-        print("No PDF files found in the directory.")
+    return pdf_files
 
 def ingest_from_path(paths):
     conn = duckdb.connect(DATABASE_PATH)
@@ -45,34 +45,35 @@ def ingest_from_path(paths):
     """)
     conn.close()
 
-    conn = duckdb.connect(DATABASE_PATH)
-    result = conn.execute("SELECT * FROM pdf_files").fetchall()
-    conn.close()
-    print(result)
-
-    if paths == None:
-        return True
     for path in paths:
-        
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name='LangChainCollection', drop_old=False, auto_id=True)
-        # Assuming PyPDFDirectoryLoader is defined elsewhere and UPLOAD_FOLDER is a constant
+        
         docs = PyPDFDirectoryLoader(path).load()  
         chunks = text_splitter.split_documents(docs)
         chunks = filter_complex_metadata(chunks)  # Assuming this function is defined elsewhere
         print(f"Number of chunks: {len(chunks)}")
         mil.add_documents(chunks)
         print("Ingest done for path:", path)
+
         pdf_files = list_pdf_filenames(path)
         for file in pdf_files:
+            old_path = os.path.join(path, file)
+            new_path = os.path.join(UPLOAD_FOLDER, file)
+
+            # Move file to the new location
+            shutil.move(old_path, new_path)
+
+            # Update the database with the new path
             conn = duckdb.connect(DATABASE_PATH)
             conn.execute("""
-            INSERT INTO pdf_files 
-            VALUES (nextval('seq_fileid'),'{file_path}', '{file_name}')
+            INSERT INTO pdf_files (file_path, file_name)
+            VALUES ('{file_path}', '{file_name}')
             ON CONFLICT (id) DO NOTHING;
-            """.format(file_path = os.path.join(path,file), file_name = file))
+            """.format(file_path=new_path, file_name=file))
             conn.close()
+
     return True
 
 if __name__ == '__main__':
