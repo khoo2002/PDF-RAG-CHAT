@@ -68,8 +68,8 @@ def ingest_from_path(paths):
             # Update the database with the new path
             conn = duckdb.connect(DATABASE_PATH)
             conn.execute("""
-            INSERT INTO pdf_files (file_path, file_name)
-            VALUES ('{file_path}', '{file_name}')
+            INSERT INTO pdf_files 
+            VALUES (nextval('seq_fileid'),'{file_path}', '{file_name}')
             ON CONFLICT (id) DO NOTHING;
             """.format(file_path=new_path, file_name=file))
             conn.close()
