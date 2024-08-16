@@ -850,6 +850,33 @@ def get_feedback_for_answer(answer_id):
 
     else:
         return "Bad Request", 404
+OLLAMA_URL = "http://localhost:11434/"
+
+# Helper function to send requests to the base URL
+def send_request(endpoint, method, data=None):
+    url = OLLAMA_URL + endpoint
+    headers = {'Content-Type': 'application/json'}
+    
+    if method == "GET":
+        response = requests.get(url, headers=headers)
+    elif method == "POST":
+        response = requests.post(url, json=data, headers=headers)
+    elif method == "PUT":
+        response = requests.put(url, json=data, headers=headers)
+    elif method == "DELETE":
+        response = requests.delete(url, headers=headers)
+    else:
+        return {"error": "Unsupported method"}
+
+    return response.json()
+
+@app.route('/ollama/api/<path:endpoint>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def api_proxy(endpoint):
+    method = request.method
+    data = request.json if method in ["POST", "PUT"] else None
+    response = send_request(endpoint, method, data)
+    return jsonify(response)
+
 
 
 if __name__ == '__main__':
