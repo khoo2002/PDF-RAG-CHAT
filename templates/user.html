@@ -341,77 +341,85 @@ function waitDone() {
     document.getElementById('loadingUI').style.display = 'none';
 }
 
+async function sendToBackend(message) {
+    try {
+        const requestData = { prompt: message };
+        console.log(requestData);
 
-function sendToBackend(message) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4) {
-            if (this.status == 200) {
-                var responseText = this.responseText;
-                var responseData = JSON.parse(responseText);
-                console.log(responseData);
-                console.log(responseData.question_id);
-                
-                if (responseData.question_id !== -1) {
-                    var intervalId = setInterval(function() {
-                        var result = loopGetAnswer(responseData.question_id);
-                        console.log("sendToBackend Debug 1: " + result);
-                        result = findChatMessageById(responseData.question_id);
-                        console.log("sendToBackend Debug 1.5: " + result);
-                        if (result === true) {
-                            clearInterval(intervalId); // Stop the interval
-                        }
-                    }, 2000); // 2000 milliseconds = 2 seconds
-                }
-                // waitDone();
-                // displaySystemMessage(responseData.answer_text);
-                // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
-            } else {
-                waitDone();
-                displaySystemMessage("Failed to get response from the backend.");
-                return -1;
+        const response = await fetch(localUrl("/api/user/chat/"), {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.status === 200) {
+            const responseData = await response.json();
+            console.log(responseData);
+            console.log(responseData.question_id);
+            
+            if (responseData.question_id !== -1) {
+                const intervalId = setInterval(async function() {
+                    const result = await loopGetAnswer(responseData.question_id);
+                    console.log("sendToBackend Debug 1: " + result);
+                    
+                    const foundResult = findChatMessageById(responseData.question_id);
+                    console.log("sendToBackend Debug 1.5: " + foundResult);
+                    
+                    if (foundResult === true) {
+                        clearInterval(intervalId); // Stop the interval
+                    }
+                }, 2000); // 2000 milliseconds = 2 seconds
             }
+            // waitDone();
+            // displaySystemMessage(responseData.answer_text);
+            // addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+        } else {
+            waitDone();
+            displaySystemMessage("Failed to get response from the backend.");
+            return -1;
         }
-    };
-    xhttp.open("POST", localUrl("/api/user/chat/"), false);
-    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    console.log(message);
-    var requestData = { prompt: message };
-    console.log(requestData);
-    xhttp.send(JSON.stringify(requestData));
-    
+    } catch (error) {
+        waitDone();
+        displaySystemMessage("An error occurred while sending the message to the backend.");
+        console.error("sendToBackend Error:", error);
+        return -1;
+    }
 }
 
-function loopGetAnswer(question_id) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4) {
-            if (this.status == 200) {
-                var responseText = this.responseText;
-                var responseData = JSON.parse(responseText);
-                waitDone();
-                displaySystemMessage(responseData.answer_text);
-                addAnswerId(responseData.answer_id); // Add answer_id to the chat message
-                addQuestionId(question_id); // Add answer_id to the chat message
-                var answer_id = responseData.answer_id;
-                console.log("loopGetAnswer Debug 1: true");
-                return [true, answer_id];
-            }else if(this.status=209){
-                // waitDone();
-                console.log("loopGetAnswer Debug 1: false");
-                return [false,-1];
-            } else {
-                waitDone();
-                displaySystemMessage("Failed to get response from the backend.");
-                console.log("loopGetAnswer Debug 1.5: true");
-                return [true,-1];
-            }
+async function loopGetAnswer(question_id) {
+    try {
+        const response = await fetch(localUrl(`/api/user/chat/getAnswer/${question_id}`), {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (response.status === 200) {
+            const responseData = await response.json();
+            waitDone();
+            displaySystemMessage(responseData.answer_text);
+            addAnswerId(responseData.answer_id); // Add answer_id to the chat message
+            addQuestionId(question_id); // Add question_id to the chat message
+            console.log("loopGetAnswer Debug 1: true");
+            return [true, responseData.answer_id];
+        } else if (response.status === 209) {
+            // waitDone();
+            console.log("loopGetAnswer Debug 1: false");
+            return [false, -1];
+        } else {
+            waitDone();
+            displaySystemMessage("Failed to get response from the backend.");
+            console.log("loopGetAnswer Debug 1.5: true");
+            return [true, -1];
         }
-    };
-    xhttp.open("GET", localUrl("/api/user/chat/getAnswer/"+question_id), false);
-    xhttp.send();
+    } catch (error) {
+        waitDone();
+        displaySystemMessage("An error occurred while trying to get a response from the backend.");
+        console.error("loopGetAnswer Error:", error);
+        return [true, -1];
+    }
 }
 
 

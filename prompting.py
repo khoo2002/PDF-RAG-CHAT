@@ -1,4 +1,4 @@
-import duckdb
+# import duckdb
 from rag import TestingChat
 from app import Answer
 import datetime
@@ -6,25 +6,27 @@ from threading import Thread
 import sys
 import time
 
-
 def generate(question, question_id):
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     test = TestingChat()
+    # Measure execution time
+    start_time = time.time()
+    
     response_text = test.ask(question)
     print(response_text)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
     # Store the answer
     answer_record = {
         'question_id': question_id,  # Use the same question ID as the question
         'answer_text': response_text,
         'created_at': timestamp
     }
-    # Measure execution time
-    start_time = time.time()
-
+    
     answer = Answer.store_answer(answer_record)
     # Calculate elapsed time
-    end_time = time.time()
-    elapsed_time = end_time - start_time
+    # end_time = time.time()
+    # elapsed_time = end_time - start_time
     
     # Print the elapsed time
     print(f"Store Answer log - Elapsed time: {elapsed_time} seconds")
@@ -44,6 +46,8 @@ def generate(question, question_id):
     print('done')
 
     return response_text
+
+
 
 if __name__ == "__main__":
     print(sys.argv[1])

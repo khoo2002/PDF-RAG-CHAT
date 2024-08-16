@@ -762,7 +762,9 @@ def prompting():
         print(f"Store Question log - Elapsed time: {elapsed_time} seconds")
 
         print('start prompting')
-        subprocess.Popen(["python3", "prompting.py", f"'{tmpQ.question}'", f"{tmpQ.question_id}"], close_fds=True)
+        process=subprocess.Popen(["python", "prompting.py", f"'{tmpQ.question}'", f"{tmpQ.question_id}"], close_fds=True)
+       
+        # process=subprocess.Popen(f"""cd \"C:\\Users\\adriana\\PDF-RAG-CHAT\" | venv\\Scripts\\activate | python prompting.py '{tmpQ.question}' {tmpQ.question_id}""", close_fds=True, shell=True)
         print("I dont want to wait")
         # response_text = test.ask(json_dict['prompt'])
         # print(response_text)
@@ -848,6 +850,7 @@ def get_feedback_for_answer(answer_id):
 
     else:
         return "Bad Request", 404
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=False, port=8001, threaded=True)
