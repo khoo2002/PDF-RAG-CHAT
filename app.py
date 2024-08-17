@@ -17,6 +17,7 @@ from rag import TestingChat
 import json
 import subprocess
 import time
+import requests
 
 import shutil
 
