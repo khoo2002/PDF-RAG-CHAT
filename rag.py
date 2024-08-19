@@ -480,160 +480,262 @@ class TestingChat:
         
     #     return self.llama3Chain.invoke(query)
 
-    "Test: Prompts Ver #1 with sequential"
-    def ask(self, query: str,filename): 
-        self.llama3Model = ChatOllama(model="llama3.1:8b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
-        self.mistralModel = ChatOllama(model="mistral:7b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
+    "Test: Each model prompts - Non MultiModel Architecture # Qwen2"
+    def ask(self, query: str, filename):
         self.qwen2Model = ChatOllama(model="qwen2:7b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
-    
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
-        self.llama3L1Prompt = None
-        self.mistralPrompt = None
+        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
         self.qwen2Prompt = None
-        self.llama3Prompt = None
-        qwen2Option = None
-        llama3L1Option = None
         keywords = ["section", "cma", "communications and multimedia act"]
         if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
-
-            self.mistralPrompt = PromptTemplate.from_template("""
-            <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
-            Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
-            You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
-            CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998.
-            **Context**: {context} {adding_pack}. <|eot_id|>
-            <|start_header_id|>user<|end_header_id|>
-            **Question**: {question} <|eot_id|>
-            <|start_header_id|>senior staff<|end_header_id|>
-            **Answer**:
-            
-            **Document Name**: [Insert Document Name]
-            """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
-            
             self.qwen2Prompt = PromptTemplate.from_template("""
-                Based on the provided context, provide a concise answer in a maximum of three sentences, in the same language as the question. If unsure, state that you do not know. 
-                Ensure all sources are accurately referenced, and include the document name when referencing any document. 
-                If the content is discriminatory or offensive, provide justification and proof to support investigations and content removal. 
-                The current Prime Minister is Dato' Sri Anwar Ibrahim, serving from 24 November 2022 until now. 
-
-                Context: {context} {adding_pack} 
-                Note: CMA refers to the Communications & Multimedia Act 1998.
-
-                Question: {question}
+                <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+                You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
+                Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+                You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
+                CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998.
+                **Context**: {context} {adding_pack}. <|eot_id|>
+                <|start_header_id|>user<|end_header_id|>
+                **Question**: {question} <|eot_id|>
+                <|start_header_id|>senior staff<|end_header_id|>
+                **Answer**:
+                
+                **Document Name**: [Insert Document Name]
                 """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
             
-            self.llama3Prompt = ("""
-            <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-                                                         
-            You are a senior staff member at the Malaysian Communications & Multimedia Commission (MCMC) in Malaysia, tasked with fact-checking and answering queries across all relevant topics. 
-            As a senior staff, from the options given, cross-check each option with the provided context and take the most accurate information from the options. 
-            Provide a concise answer in the same language as the question. Ensure that it is related to context and question.
-            The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. Include the source if exists.
-                                                         
-            Options: {option1}.{option2} 
-            Context: {context} 
-            Note: CMA refers to the Communications & Multimedia Act 1998. <|eot_id|>
-                                                         
-            <|start_header_id|>user<|end_header_id|>
-                                                           
-            Question: {question} <|eot_id|>
-                                                         
-            <|start_header_id|>senior staff<|end_header_id|>
-            Answer:
-            
-            Document Name: [Insert Document Name]
-            """)
-
         else:
-            self.mistralPrompt = PromptTemplate.from_template("""
-            <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-            You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
-            Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. 
-            Ensure all sources are accurately referenced. **Must add the document name when using**.
-            You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content.
-            **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998.<|eot_id|>
-            <|start_header_id|>user<|end_header_id|>
-            **Question**: {question} <|eot_id|>
-            <|start_header_id|>senior staff<|end_header_id|>
-            **Answer**:
-        
-            **Document Name**: [Insert Document Name]
-            """)    
-
             self.qwen2Prompt = PromptTemplate.from_template("""
-                Based on the provided context, provide a concise answer in a maximum of three sentences, in the same language as the question. If unsure, state that you do not know. 
-                Ensure all sources are accurately referenced, and include the document name when referencing any document. 
-                If the content is discriminatory or offensive, provide justification and proof to support investigations and content removal. 
-                The current Prime Minister is Dato' Sri Anwar Ibrahim, serving from 24 November 2022 until now. 
-
-                Context: {context} 
-                Note: CMA refers to the Communications & Multimedia Act 1998.
-
-                Question: {question}
-                """)
-            
-            self.llama3Prompt = ("""
                 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-                You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics.  
-                From the options given, cross-check each option with the provided context and take the most accurate information from the options. 
-                Provide a concise answer in the same language as the question. Ensure that it is related to context and question. Include the source if exists.
-                The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.
-                                                                                                                                                   
-                Options: {option1}.{option2} 
-                Context: {context} 
-                Note: CMA refers to the Communications & Multimedia Act 1998. <|eot_id|>
-                                                         
+                You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
+                Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+                You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
+                CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998.
+                **Context**: {context} <|eot_id|>
                 <|start_header_id|>user<|end_header_id|>
-                                                           
-                Question: {question} <|eot_id|>
-                                                         
+                **Question**: {question} <|eot_id|>
                 <|start_header_id|>senior staff<|end_header_id|>
-                Answer:
-            
-                Document Name: [Insert Document Name]
+                **Answer**:
+                
+                **Document Name**: [Insert Document Name]
                 """)
-
+        
         embedding_model = OllamaEmbeddings(model='nomic-embed-text')
         mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
         self.vector_store = mil
         self.retriever = self.vector_store.as_retriever()
-        
-        self.mistralChain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                            | self.mistralPrompt
-                            | self.mistralModel
-                            | StrOutputParser())
         self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                            | self.mistralPrompt
+                            | self.qwen2Prompt
                             | self.qwen2Model
                             | StrOutputParser())
         
-        # Sequential Start
-        qwen2Option = self.qwen2Chain.invoke(query)
-        mistralOption = self.mistralChain.invoke(query)
-        # Sequential End
+        answer = self.qwen2Chain.invoke(query)
 
-        # # Parallel Start
-        # self.map_chain = RunnableParallel(llama3=self.llama3L1Chain, qwen2=self.qwen2Chain)
-
-        # response = self.map_chain.invoke(query)
-
-        # llama3L1Option = response.get("llama3")
-        # qwen2Option = response.get("qwen2")
-        # # Parallel End
-
-        self.llama3Prompt = PromptTemplate.from_template(self.llama3Prompt.format(option1=qwen2Option, option2=mistralOption, context="{context}", question="{question}"))
-        self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
-                            | self.llama3Prompt
-                            | self.llama3Model
-                            | StrOutputParser())
-
-        answer = self.llama3Chain.invoke(query)
-
-        with open(filename, 'a') as log_file:
-            log_file.write(f"Question: {query}\n\nMistral: {mistralOption}\n\nQwen2: {qwen2Option}\n\nFinal Answer: {answer}\n\n")
+        # with open(filename, 'a') as log_file:
+        #     log_file.write(f"Question: {query}\n\nFinal Answer: {answer}\n\n")
 
         return answer
+    
+    "Test: Each model prompts - Non MultiModel Architecture # Mistral"
+    # def ask(self, query: str, filename):
+    #     self.mistralModel = ChatOllama(model="mistral:7b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
+    #     self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)  
+    #     self.mistralPrompt = None
+    #     keywords = ["section", "cma", "communications and multimedia act"]
+    #     if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
+    #         self.mistralPrompt = PromptTemplate.from_template("""
+    #             You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
+    #             Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+    #             You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
+    #             CMA is COMMUNICATIONS AND MULTIMEDIA ACT 1998.
+                                                              
+    #             Context: {context} {adding_pack} 
+    #             Note: CMA refers to the Communications & Multimedia Act 1998.
+
+    #             Question: {question}
+    #             """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
+            
+    #     else:
+    #         self.mistralPrompt = PromptTemplate.from_template("""
+    #             You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
+    #             Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+    #             You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
+    #             CMA is COMMUNICATIONS AND MULTIMEDIA ACT 1998.
+                                                              
+    #             Context: {context} 
+    #             Note: CMA refers to the Communications & Multimedia Act 1998.
+
+    #             Question: {question}
+    #             """)
+        
+    #     embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+    #     mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
+    #     self.vector_store = mil
+    #     self.retriever = self.vector_store.as_retriever()
+    #     self.mistralChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+    #                         | self.mistralPrompt
+    #                         | self.mistralModel
+    #                         | StrOutputParser())
+        
+    #     answer = self.mistralChain.invoke(query)
+
+    #     with open(filename, 'a') as log_file:
+    #         log_file.write(f"Question: {query}\n\nFinal Answer: {answer}\n\n")
+
+    #     return answer
+
+    "Test: Prompts Ver #1 with sequential"
+    # def ask(self, query: str,filename): 
+    #     self.llama3Model = ChatOllama(model="llama3.1:8b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
+    #     self.mistralModel = ChatOllama(model="mistral:7b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
+    #     self.qwen2Model = ChatOllama(model="qwen2:7b-instruct-q4_0", top_k=10, top_p=0.5, temperature=0.4)
+    
+    #     self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=200)
+    #     self.llama3L1Prompt = None
+    #     self.mistralPrompt = None
+    #     self.qwen2Prompt = None
+    #     self.llama3Prompt = None
+    #     qwen2Option = None
+    #     llama3L1Option = None
+    #     keywords = ["section", "cma", "communications and multimedia act"]
+    #     if re.search("section", query.lower()) or re.search("cma", query.lower()) or re.search("communications and multimedia act", query.lower()):
+
+    #         self.mistralPrompt = PromptTemplate.from_template("""
+    #         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    #         You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
+    #         Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. Ensure all sources are accurately referenced. **Must add the document name when using**.
+    #         You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. 
+    #         CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998.
+    #         **Context**: {context} {adding_pack}. <|eot_id|>
+    #         <|start_header_id|>user<|end_header_id|>
+    #         **Question**: {question} <|eot_id|>
+    #         <|start_header_id|>senior staff<|end_header_id|>
+    #         **Answer**:
+            
+    #         **Document Name**: [Insert Document Name]
+    #         """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
+            
+    #         self.qwen2Prompt = PromptTemplate.from_template("""
+    #             Based on the provided context, provide a concise answer in a maximum of three sentences, in the same language as the question. If unsure, state that you do not know. 
+    #             Ensure all sources are accurately referenced, and include the document name when referencing any document. 
+    #             If the content is discriminatory or offensive, provide justification and proof to support investigations and content removal. 
+    #             The current Prime Minister is Dato' Sri Anwar Ibrahim, serving from 24 November 2022 until now. 
+
+    #             Context: {context} {adding_pack} 
+    #             Note: CMA refers to the Communications & Multimedia Act 1998.
+
+    #             Question: {question}
+    #             """.format(context="{context}",adding_pack=cma_adding_pack,question="{question}"))
+            
+    #         self.llama3Prompt = ("""
+    #         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+                                                         
+    #         You are a senior staff member at the Malaysian Communications & Multimedia Commission (MCMC) in Malaysia, tasked with fact-checking and answering queries across all relevant topics. 
+    #         As a senior staff, from the options given, cross-check each option with the provided context and take the most accurate information from the options. 
+    #         Provide a concise answer in the same language as the question. Ensure that it is related to context and question.
+    #         The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. Include the source if exists.
+                                                         
+    #         Options: {option1}.{option2} 
+    #         Context: {context} 
+    #         Note: CMA refers to the Communications & Multimedia Act 1998. <|eot_id|>
+                                                         
+    #         <|start_header_id|>user<|end_header_id|>
+                                                           
+    #         Question: {question} <|eot_id|>
+                                                         
+    #         <|start_header_id|>senior staff<|end_header_id|>
+    #         Answer:
+            
+    #         Document Name: [Insert Document Name]
+    #         """)
+
+    #     else:
+    #         self.mistralPrompt = PromptTemplate.from_template("""
+    #         <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    #         You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics. 
+    #         Based on the provided context, provide a **concise answer maximum is three sentences** in the same language as the question. If unsure, state that you do not know. 
+    #         Ensure all sources are accurately referenced. **Must add the document name when using**.
+    #         You must give justification and proof of discriminatory or offensive contents to help to investigate and remove those content.
+    #         **Context**: {context}. The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now. CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998.<|eot_id|>
+    #         <|start_header_id|>user<|end_header_id|>
+    #         **Question**: {question} <|eot_id|>
+    #         <|start_header_id|>senior staff<|end_header_id|>
+    #         **Answer**:
+        
+    #         **Document Name**: [Insert Document Name]
+    #         """)    
+
+    #         self.qwen2Prompt = PromptTemplate.from_template("""
+    #             Based on the provided context, provide a concise answer in a maximum of three sentences, in the same language as the question. If unsure, state that you do not know. 
+    #             Ensure all sources are accurately referenced, and include the document name when referencing any document. 
+    #             If the content is discriminatory or offensive, provide justification and proof to support investigations and content removal. 
+    #             The current Prime Minister is Dato' Sri Anwar Ibrahim, serving from 24 November 2022 until now. 
+
+    #             Context: {context} 
+    #             Note: CMA refers to the Communications & Multimedia Act 1998.
+
+    #             Question: {question}
+    #             """)
+            
+    #         self.llama3Prompt = ("""
+    #             <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+    #             You are a senior staff member at the **Malaysian Communications & Multimedia Commission (MCMC)** in **Malaysia**, tasked with fact-checking and answering queries across all relevant topics.  
+    #             From the options given, cross-check each option with the provided context and take the most accurate information from the options. 
+    #             Provide a concise answer in the same language as the question. Ensure that it is related to context and question. Include the source if exists.
+    #             The current Prime Minister is Dato' Sri Anwar Ibrahim from 24 November 2022 until now.
+                                                                                                                                                   
+    #             Options: {option1}.{option2} 
+    #             Context: {context} 
+    #             Note: CMA refers to the Communications & Multimedia Act 1998. <|eot_id|>
+                                                         
+    #             <|start_header_id|>user<|end_header_id|>
+                                                           
+    #             Question: {question} <|eot_id|>
+                                                         
+    #             <|start_header_id|>senior staff<|end_header_id|>
+    #             Answer:
+            
+    #             Document Name: [Insert Document Name]
+    #             """)
+
+    #     embedding_model = OllamaEmbeddings(model='nomic-embed-text')
+    #     mil = Milvus(embedding_function=embedding_model, collection_name = 'LangChainCollection', drop_old = False)
+    #     self.vector_store = mil
+    #     self.retriever = self.vector_store.as_retriever()
+        
+    #     self.mistralChain = ({"context": self.retriever, "question": RunnablePassthrough()}
+    #                         | self.mistralPrompt
+    #                         | self.mistralModel
+    #                         | StrOutputParser())
+    #     self.qwen2Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+    #                         | self.mistralPrompt
+    #                         | self.qwen2Model
+    #                         | StrOutputParser())
+        
+    #     # Sequential Start
+    #     qwen2Option = self.qwen2Chain.invoke(query)
+    #     mistralOption = self.mistralChain.invoke(query)
+    #     # Sequential End
+
+    #     # # Parallel Start
+    #     # self.map_chain = RunnableParallel(llama3=self.llama3L1Chain, qwen2=self.qwen2Chain)
+
+    #     # response = self.map_chain.invoke(query)
+
+    #     # llama3L1Option = response.get("llama3")
+    #     # qwen2Option = response.get("qwen2")
+    #     # # Parallel End
+
+    #     self.llama3Prompt = PromptTemplate.from_template(self.llama3Prompt.format(option1=qwen2Option, option2=mistralOption, context="{context}", question="{question}"))
+    #     self.llama3Chain = ({"context": self.retriever, "question": RunnablePassthrough()}
+    #                         | self.llama3Prompt
+    #                         | self.llama3Model
+    #                         | StrOutputParser())
+
+    #     answer = self.llama3Chain.invoke(query)
+
+    #     with open(filename, 'a') as log_file:
+    #         log_file.write(f"Question: {query}\n\nMistral: {mistralOption}\n\nQwen2: {qwen2Option}\n\nFinal Answer: {answer}\n\n")
+
+    #     return answer
 
         
     "Test: Llama3 L2 prompts diff ver"

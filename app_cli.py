@@ -8,8 +8,7 @@ if os.path.exists(LOG_DIR) != True:
 
 # Generate a unique log file name at the start of the session
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-session_log_file = f'../log/log_response_{timestamp}.txt'
-
+session_log_file = f'../log/log_response_qwen2_{timestamp}.txt'
 
 def chat():
     chatbot = TestingChat()
@@ -23,17 +22,17 @@ def chat():
         print(f"MCMC Staff: {answer}\n")
         
 
-def history():
-    chatbot = ChatbotWithSessionHistory()
+# def history():
+#     chatbot = ChatbotWithSessionHistory()
 
-    while True:
-        question = input("You: ")
-        if question.lower() in ["x", "quit"]:
-            print("Goodbye!")
-            # chatbot.clear_history()  # Clear history when the session ends
-            break
-        answer = chatbot.ask(question)
-        print(f"Chatbot: {answer}")
+#     while True:
+#         question = input("You: ")
+#         if question.lower() in ["x", "quit"]:
+#             print("Goodbye!")
+#             # chatbot.clear_history()  # Clear history when the session ends
+#             break
+#         answer = chatbot.ask(question)
+#         print(f"Chatbot: {answer}")
 
 if __name__ == "__main__":
     chat()
