@@ -21,10 +21,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain, create_history_aware_retriever
 from langsmith import traceable
 
-LANGCHAIN_TRACING_V2=True
-LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-LANGCHAIN_API_KEY="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"
-LANGCHAIN_PROJECT="chatbot-ai"
+
 
 cma_adding_pack = """CMA is  COMMUNICATIONS AND MULTIMEDIA ACT 1998. The content is below. 
 Section 1, Short title
